@@ -144,8 +144,9 @@ cuhFramework = {
 	callbacks = {},
 	commands = {},
 	saveData = {},
+	tps = {},
 
-	BACKEND = {
+	backend = {
 		updates = {
 			---Insert update function. Don't use this yourself
 			---@param func function Function that should be called every tick
@@ -180,8 +181,8 @@ g_savedata = {}
 --//Backend - Updates [DO NOT USE]\\--
 ----------------------------------------
 ----------------------------------------
-cuhFramework.BACKEND.updates:create_exception(cuhFramework.BACKEND.updates.create_exception)
-cuhFramework.BACKEND.updates:create_exception(cuhFramework.BACKEND.updates.insert)
+cuhFramework.backend.updates:create_exception(cuhFramework.backend.updates.create_exception)
+cuhFramework.backend.updates:create_exception(cuhFramework.backend.updates.insert)
 
 ----------------------------------------
 ----------------------------------------
@@ -206,9 +207,9 @@ cuhFramework.callbacks.onTick = {
 }
 
 function onTick(...)
-	-- BACKEND - Update
-	for i, v in pairs(cuhFramework.BACKEND.updates) do
-		if cuhFramework.utilities.table.valueInTable(cuhFramework.BACKEND.updates.exceptions, v) then
+	-- Backend - Update
+	for i, v in pairs(cuhFramework.backend.updates) do
+		if cuhFramework.utilities.table.valueInTable(cuhFramework.backend.updates.exceptions, v) then
 			goto continue
 		end
 
@@ -1262,6 +1263,21 @@ cuhFramework.utilities.table.uppercaseStringValues = function(tbl)
 	return new
 end
 
+---Get the sum of all number values in a table
+---@param tbl table Table of values to sum up
+---@return number result The added values
+cuhFramework.utilities.table.sumOfTable = function(tbl)
+	local current = 0
+
+	for i, v in pairs(tbl) do
+		if type(v) == "number" then
+			current = current + v
+		end
+	end
+
+	return current
+end
+
 ------------------------
 ------Number
 ------------------------
@@ -1329,7 +1345,7 @@ cuhFramework.utilities.delay.update = function()
 	end
 end
 
-cuhFramework.BACKEND.updates:insert(cuhFramework.utilities.delay.update) -- reference
+cuhFramework.backend.updates:insert(cuhFramework.utilities.delay.update) -- reference
 
 ---Call a function after x seconds
 ---@param duration number How long until the callback is called in seconds
@@ -1396,7 +1412,7 @@ cuhFramework.utilities.loop.update = function()
 	end
 end
 
-cuhFramework.BACKEND.updates:insert(cuhFramework.utilities.loop.update) -- reference
+cuhFramework.backend.updates:insert(cuhFramework.utilities.loop.update) -- reference
 
 ---Call a function every x seconds
 ---@param duration number How long until the callback is called in seconds
@@ -1529,7 +1545,7 @@ cuhFramework.commands.remove = function(command_id)
 	cuhFramework.commands.registeredCommands = nil
 end
 
----Manage commands [BACKEND]
+---Manage commands [Backend]
 cuhFramework.callbacks.onCustomCommand:connect(function(msg, peer_id, is_admin, is_auth, command, ...)
 	local args = {...}
 	command = command:sub(2, #command) --"?hey" becomes "hey"
@@ -1790,6 +1806,45 @@ cuhFramework.players.getPlayerCount = function()
 	end
 
 	return count
+end
+
+----------------------------------------
+----------------------------------------
+--//Framework - TPS\\--
+----------------------------------------
+----------------------------------------
+cuhFramework.tps.tpsData = {
+	average = 62.0, ---Average server TPS
+	tps = 62.0, ---Server TPS
+	ticks = 0, ---Ignore
+	ticks_time = 0, ---Ignore
+	backend_avgTpsTable = {} ---Ignore
+}
+
+-- Update TPS [Backend]
+cuhFramework.backend.updates:insert(function()
+	-- increase ticks
+	cuhFramework.tps.tpsData.ticks  = cuhFramework.tps.tpsData.ticks  + 1
+
+	-- stuff
+    if server.getTimeMillisec() - cuhFramework.tps.tpsData.ticks_time >= 500 then
+        cuhFramework.tps.tpsData.tps = cuhFramework.tps.tpsData.ticks  * 2
+        cuhFramework.tps.tpsData.ticks = 0
+        cuhFramework.tps.tpsData.ticks_time = server.getTimeMillisec()
+    end
+
+	-- get average tps
+	if #cuhFramework.tps.tpsData.averageTpsTable <= 120 then
+		table.insert(cuhFramework.tps.tpsData.averageTpsTable, cuhFramework.tps.tpsData.tps) -- insert current tps value into average tps table
+	else
+		cuhFramework.tps.tpsData.average = cuhFramework.utilities.table.sumOfTable(cuhFramework.tps.tpsData.averageTpsTable) / #cuhFramework.tps.tpsData.averageTpsTable -- get average tps
+		cuhFramework.tps.tpsData.averageTpsTable = {} -- reset
+	end
+end)
+
+---Get TPS Data
+cuhFramework.tps.getTPSData = function()
+	return cuhFramework.tps.tpsData
 end
 
 ------------------------------------------------------------------------
