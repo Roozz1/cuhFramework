@@ -103,7 +103,7 @@ if not desired.isnumeric():
     warn("Invalid input (not a number).")
     timedExit(5)
     
-if not luaFilesInDir[int(desired)]:
+if int(desired) < 0 or int(desired) > len(luaFilesInDir) - 1:
     warn("Invalid input (file doesn't exist).")
     timedExit(5)
 
