@@ -36,6 +36,9 @@ connection:disconnect() -- The function will no longer get called when a vehicle
 ```
 (Callbacks system inspired by Roblox)
 
+## *Documentation*
+[Click here](https://github.com/Roozz1/cuhFramework/wiki) for the documentation.
+
 ## *Examples*
 
 Want to see some examples that show you how to use this? If so, [click here](https://github.com/Roozz1/cuhFramework/tree/main/examples).
