@@ -45,8 +45,18 @@ Want to see some examples that show you how to use this? If so, [click here](htt
 It is **highly recommended** that you code your addon in a different .lua file to cuhFramework.lua (script.lua or another file).
 
 
-It is also **highly recommended** that you use the popular Lua LSP extension on VSCode, and it is also **recommended** that you use NameousChangey's "Stormworks Lua with LifeboatAPI"
+It is also **highly recommended** that you use the popular Lua LSP extension by sumneko on VSCode, and it is also **recommended** that you use NameousChangey's Stormworks Lua with LifeboatAPI
 VSCode Extension.
 
 
 **Make sure** to code your addon with something like VSCode. Do **not** use the in-game editor because, chances are, your code and the cuhFramework combined will not fit within the in-game addon character limit. The limit can be bypassed if you code outside of in-game (using something like VSCode as said), which is why you shouldn't code your addon in-game.
+
+## *Features*
+1. Neat player system
+2. Loop system (call a function every x seconds)
+3. Delay system (call a function after x seconds)
+4. Custom commands system (add a command easily, remove a command, edit a command)
+5. Utility features (loop, delay, string functions, table functions, number functions, etc)
+6. Lua-LSP VSCode extension by sumneko compatible
+7. Build feature, combines your addon code with cuhFramework, allowing you to code your addon without a lot of lines being taken by cuhFramework
+8. Works with intellisense (use Lua-LSP VSCode extension by sumneko for this)
