@@ -10,7 +10,7 @@
 	------
 	This is the cuhFramework.lua file, which contains the cuhFramework (duh).
 	It is HIGHLY recommended that you code your addon in a different .lua file (script.lua or another file),
-	then when you are ready, run 'build.exe' to combine your code with this framework to use in-game.
+	then when you are ready, run 'cF-build.exe' to combine your code with this framework ready to use in-game.
 
 	It is highly recommended that you use the popular Lua LSP extension on VSCode,
 	and it is also highly recommended that you use NameousChangey's "Stormworks Lua with LifeboatAPI"
@@ -1138,7 +1138,7 @@ cuhFramework.utilities.string = {}
 
 ---Converts a string into a table, same as Python's split() function, from: https://stackoverflow.com/questions/1426954/split-string-in-lua
 ---@param str string String to split
----@param sep string Pattern to split the string by
+---@param sep string|nil Pattern to split the string by
 ---@return table split_string The split string in a table
 cuhFramework.utilities.string.split = function(str, sep)
 	if sep == nil then
