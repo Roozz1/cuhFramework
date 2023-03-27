@@ -32,7 +32,7 @@ end)
 ```
 You can even **disconnect** the function, making it obsolete, by doing:
 ```lua
-connection:disconnect() -- The function will no longer get fired when a vehicle is spawned
+connection:disconnect() -- The function will no longer get called when a vehicle is spawned
 ```
 (Callbacks system inspired by Roblox)
 
