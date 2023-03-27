@@ -10,7 +10,7 @@ cuhFramework, a framework that should greatly improve the ease of addon developm
 Compatible with intellisense.
 
 
-The framework comes with many utility functions, like chat functions, table functions, string functions (see below), and many more.
+The framework comes with many utility functions, like chat functions, table functions, string functions (see below), loop and delay functions, and more.
 ```lua
 local converted = cuhFramework.utilities.string.split("the input string", " ") -- {"the" "input" "string"}
 local converted2 = cuhFramework.utilities.string.split("the input string") -- {"the" "input" "string"}
@@ -38,11 +38,11 @@ connection:disconnect() -- The function will no longer get fired when a vehicle 
 
 ## *Examples*
 
-Want to see some examples that show you how to use the cuhFramework? If so, [click here](https://github.com/Roozz1/cuhFramework/tree/main).
+Want to see some examples that show you how to use this? If so, [click here](https://github.com/Roozz1/cuhFramework/tree/main/examples).
 
 ## *Disclaimers*
 
-It is **highly recommended** that you code your addon in a different .lua file (script.lua or another file).
+It is **highly recommended** that you code your addon in a different .lua file to cuhFramework.lua (script.lua or another file).
 
 
 It is also **highly recommended** that you use the popular Lua LSP extension on VSCode, and it is also **recommended** that you use NameousChangey's "Stormworks Lua with LifeboatAPI"
