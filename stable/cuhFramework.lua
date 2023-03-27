@@ -1584,10 +1584,11 @@ cuhFramework.chat.send_message = function(author, message, peer_id)
 end
 
 ---Clears the chat by sending 11 blank messages
+---@param peer_id integer|nil Clear the chat for the player with this peer ID. If this is nil, it becomes -1, which is everyone
 ---@return nil
-cuhFramework.chat.clear = function()
+cuhFramework.chat.clear = function(peer_id)
 	for _ = 1, 11 do
-		cuhFramework.chat.send_message("", " ")
+		cuhFramework.chat.send_message("", " ", peer_id)
 	end
 end
 
