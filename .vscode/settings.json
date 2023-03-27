@@ -47,10 +47,10 @@
     ],
     "Lua.runtime.pathStrict": true,
     "Lua.workspace.library": [
-        "c:/Users/unlim/AppData/Roaming/Stormworks/data/missions/cuhFramework_build_test/",
+        "c:/Users/unlim/AppData/Roaming/Stormworks/data/missions/cuhFramework/cuhFramework/",
         "c:/Users/unlim/.vscode/extensions/nameouschangey.lifeboatapi-0.0.33/assets/lua/Common/",
         "c:/Users/unlim/.vscode/extensions/nameouschangey.lifeboatapi-0.0.33/assets/lua/Addon/",
-        "c:/Users/unlim/AppData/Roaming/Stormworks/data/missions/cuhFramework_build_test/_build/libs/"
+        "c:/Users/unlim/AppData/Roaming/Stormworks/data/missions/cuhFramework/cuhFramework/_build/libs/"
     ],
     "lifeboatapi.stormworks.libs.gitLibraries": [
         {
