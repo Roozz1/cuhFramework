@@ -3,7 +3,7 @@
 
 cuh4#7366  **|**  cuhHub - Stormworks Server Hub: https://discord.gg/zTQxaZjwDr
 
->##Information
+*##Information*
 cuhFramework, a framework that should greatly improve the ease of addon development within the game Stormworks: Build and Rescue.
 
 The framework comes with many utility functions, like chat functions, table functions, string functions (see below), and many more.
@@ -25,12 +25,13 @@ local connection = cuhFramework.callbacks.onVehicleSpawn:connect(function()
     -- Your code
 end)
 ```
-You can even disconnect the function, making it obsolete, by doing:
+You can even **disconnect** the function, making it obsolete, by doing:
 ```lua
 connection:disconnect() -- The function will no longer get fired when a vehicle is spawned
 ```
+(Inspired by Roblox)
 
->##Disclaimers
+*##Disclaimers*
 It is highly recommended that you code your addon in a different .lua file (script.lua or another file).
 It is also highly recommended that you use the popular Lua LSP extension on VSCode, and it is also highly recommended that you use NameousChangey's "Stormworks Lua with LifeboatAPI"
 VSCode Extension.
