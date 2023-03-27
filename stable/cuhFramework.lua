@@ -1537,23 +1537,37 @@ cuhFramework.callbacks.onCustomCommand:connect(function(msg, peer_id, is_admin, 
 	for i, v in pairs(cuhFramework.commands.registeredCommands) do
 		local lookFor = command
 
+		-- check prefix (bit messy)
 		if v.prefix then
-			if lookFor ~= v.prefix then
-				goto continue
+			if v.caps_sensitive then
+				if lookFor ~= v.prefix then
+					goto continue
+				else
+					lookFor = args[1]
+				end
 			else
-				lookFor = args[1]
+				if lookFor:lower() ~= v.prefix:lower() then
+					goto continue
+				else
+					lookFor = args[1]
+				end
 			end
+		end
+
+		-- safety
+		if not lookFor then -- args[1] doesn't exist
+			return
 		end
 
 		-- caps sensitive
 		if v.caps_sensitive then
-			if v.command_name == command or cuhFramework.utilities.table.valueInTable(v.shorthands, command) then
-				v.callback(msg, peer_id, is_admin, is_auth, command, ...)
+			if v.command_name == lookFor or cuhFramework.utilities.table.valueInTable(v.shorthands, lookFor) then
+				v.callback(msg, peer_id, is_admin, is_auth, lookFor, ...)
 			end
 		else
 			-- not caps sensitive
-			if v.command_name:lower() == command:lower() or cuhFramework.utilities.table.valueInTable(cuhFramework.utilities.table.lowercaseStringValues(v.shorthands), command:lower()) then
-				v.callback(msg, peer_id, is_admin, is_auth, command, ...)
+			if v.command_name:lower() == lookFor:lower() or cuhFramework.utilities.table.valueInTable(cuhFramework.utilities.table.lowercaseStringValues(v.shorthands), lookFor:lower()) then
+				v.callback(msg, peer_id, is_admin, is_auth, lookFor, ...)
 			end
 		end
 
