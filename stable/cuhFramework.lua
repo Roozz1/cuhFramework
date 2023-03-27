@@ -1747,6 +1747,18 @@ cuhFramework.players.getPlayerByName = function(name, caps_sensitive)
 	end
 end
 
+---Get player count
+---@return integer PlayerCount Number of players in the server
+cuhFramework.players.getPlayerCount = function()
+	local count = 0
+
+	for _ in pairs(cuhFramework.players.connectedPlayers) do
+		count = count + 1
+	end
+
+	return count
+end
+
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
 -- Addon Code
