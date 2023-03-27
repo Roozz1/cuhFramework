@@ -5,7 +5,7 @@
 ------------------------------------------------------------------------
 --[[
 	------
-	Setup:
+	Setup
 	------
 	This is the cuhFramework.lua file, which contains the cuhFramework (duh).
 	It is HIGHLY recommended that you code your addon in a different .lua file (script.lua or another file),
