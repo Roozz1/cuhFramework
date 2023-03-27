@@ -1,4 +1,4 @@
-!(https://i.imgur.com/MySKMn5.png)
+![cuhFramework Banner](readme-banner.png)
 # cuhFramework
 >**An open-source framework for Stormworks: Build and Rescue's Addon API to make your life easier.**
 
