@@ -35,33 +35,33 @@
 cuhFramework = {
 	players = {},
 	vehicles = {},
+	objects = {},
 	utilities = {},
 	chat = {},
 	callbacks = {},
 	commands = {},
 	saveData = {},
 	tps = {},
+	references = {},
 
 	backend = {
 		updates = {
-			---Insert update function. Don't use this yourself
+			---Insert update function. Don't use this
 			---@param func function Function that should be called every tick
 			---@return nil
 			insert = function(self, func)
-				table.insert(self, func)
+				cuhFramework.utilities.table.insert(self, func)
 			end,
 
 			---Create an exception. The exception will not be called by onTick. Don't use this
 			---@param exception function The function to exclude
 			---@return nil
 			create_exception = function(self, exception)
-				table.insert(self.exceptions, exception)
+				cuhFramework.utilities.table.insert(self.exceptions, exception)
 			end,
 
 			exceptions = {}
-		},
-
-		data = {}
+		}
 	}
 }
 
@@ -1045,7 +1045,7 @@ cuhFramework.utilities.string.split = function(str, sep)
 	local split_string = {}
 
 	for strn in string.gmatch(str, "([^"..sep.."]+)") do
-		table.insert(split_string, strn)
+		cuhFramework.utilities.table.insert(split_string, strn)
 	end
 
 	return split_string
@@ -1365,9 +1365,6 @@ end
 ----------------------------------------
 cuhFramework.commands.registeredCommands = {}
 
-------------------------
-------Create Command
-------------------------
 ---Create a command
 ---@param command_name string The name of the command, example: "my_command"
 ---@param shorthands table|string|nil The shorthands of the command, basically additional command_names for the command, example: "m_c"
@@ -1731,7 +1728,7 @@ cuhFramework.backend.updates:insert(function()
 
 	-- get average tps
 	if #cuhFramework.tps.tpsData.averageTpsTable <= 120 then
-		table.insert(cuhFramework.tps.tpsData.averageTpsTable, cuhFramework.tps.tpsData.tps) -- insert current tps value into average tps table
+		cuhFramework.utilities.table.insert(cuhFramework.tps.tpsData.averageTpsTable, cuhFramework.tps.tpsData.tps) -- insert current tps value into average tps table
 	else
 		cuhFramework.tps.tpsData.average = cuhFramework.utilities.table.sumOfTable(cuhFramework.tps.tpsData.averageTpsTable) / #cuhFramework.tps.tpsData.averageTpsTable -- get average tps
 		cuhFramework.tps.tpsData.averageTpsTable = {} -- reset
@@ -1742,6 +1739,91 @@ end)
 cuhFramework.tps.getTPSData = function()
 	return cuhFramework.tps.tpsData
 end
+
+----------------------------------------
+----------------------------------------
+--//Framework - Objects\\--
+----------------------------------------
+----------------------------------------
+cuhFramework.objects.spawnedObjects = {}
+
+---Spawn an object
+---@param matrix SWMatrix The position to spawn the object at
+---@param object_type SWObjectTypeEnum The object to spawn
+cuhFramework.objects.spawnObject = function(matrix, object_type)
+	local obj_id, success = server.spawnObject(matrix, object_type)
+	cuhFramework.objects.spawnedObjects[obj_id] = matrix
+
+	return {
+		properties = {
+			object_id = obj_id,
+			success = success
+		},
+
+		---Despawn this object
+		---@return boolean success Whether or not despawning this object was successful
+		despawn = function(self)
+			return cuhFramework.objects.despawnObject(self.properties.object_id)
+		end,
+
+		---Teleport this object
+		---@param target_position SWMatrix The position to teleport this object to
+		---@return boolean success Whether or not the teleportation was successful
+		teleport = function(self, target_position)
+			return server.setObjectPos(self.properties.object_id, target_position)
+		end,
+
+		---Get the position of this object
+		---@return SWMatrix objectPosition The position of this object
+		---@return boolean success Whether or not getting the position of this object was successful
+		get_position = function(self)
+			return server.getObjectPos(self.properties.object_id)
+		end,
+	}
+end
+
+---Despawn an object
+---@param object_id integer The object ID of the object
+---@return boolean success Whether or not despawning this object was successful
+cuhFramework.objects.despawnObject = function(object_id)
+	cuhFramework.objects.spawnedObjects[object_id] = nil
+	return server.despawnObject(object_id, true)
+end
+
+---Despawn all addon-recognised objects
+---@return nil
+cuhFramework.objects.despawnAllObject = function()
+	for i, v in pairs(cuhFramework.objects.spawnedObjects) do
+		cuhFramework.objects.despawnObject(i)
+	end
+end
+
+----------------------------------------
+----------------------------------------
+--//Framework - References\\--
+----------------------------------------
+----------------------------------------
+
+------------------------
+------UI
+------------------------
+cuhFramework.references.addMapLabel = server.addMapLabel
+cuhFramework.references.removeMapLabel = server.removeMapLabel
+
+cuhFramework.references.createPhysicalPopup = server.setPopup
+cuhFramework.references.createScreenPopup = server.setPopupScreen
+cuhFramework.references.removePopup = server.removePopup
+
+cuhFramework.references.addMapLine = server.addMapLine
+cuhFramework.references.removeMapLine = server.removeMapLine
+
+cuhFramework.references.addMapObject = server.addMapObject
+cuhFramework.references.addMapLabel = server.addMapLabel
+cuhFramework.references.removeMapObject = server.removeMapObject
+cuhFramework.references.removeMapLabel = server.removeMapLabel
+
+cuhFramework.references.createUniqueUIID = server.getMapID
+cuhFramework.references.removeAllUIWithId = server.removeMapID
 
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
