@@ -1459,8 +1459,10 @@ cuhFramework.commands.registeredCommands = {}
 ---Create a command
 ---@param command_name string The name of the command, example: "my_command"
 ---@param shorthands table|string|nil The shorthands of the command, basically additional command_names for the command, example: "m_c"
+---@param caps_sensitive boolean|nil Whether or not the command is caps sensitive
+---@param prefix string|nil The prefix of the command. For example: If the prefix is "addon", players will need to type "?addon (command_name)" in chat to activate the command. If nil, prefixes won't be used for this command
 ---@param callback function The function that will be called upon a player typing the command
-cuhFramework.commands.create = function(command_name, shorthands, callback, caps_sensitive)
+cuhFramework.commands.create = function(command_name, shorthands, caps_sensitive, prefix, callback)
 	if type(shorthands) == "string" then
 		shorthands = {shorthands}
 	end
@@ -1470,8 +1472,9 @@ cuhFramework.commands.create = function(command_name, shorthands, callback, caps
 		id = id,
 		command_name = command_name,
 		shorthands = shorthands or {},
-		callback = callback,
 		caps_sensitive = caps_sensitive,
+		prefix = prefix,
+		callback = callback
 	}
 
 	return {
@@ -1481,13 +1484,15 @@ cuhFramework.commands.create = function(command_name, shorthands, callback, caps
 		---@param new_command_name string|nil The name of the command, example: "my_command". If this is nil, the name of the command will not be changed
 		---@param new_shorthands table|string|nil The shorthands of the command, basically additional command_names for the command, example: "m_c". If this is nil, the shorthands of the command will not be changed
 		---@param new_caps_sensitive boolean|nil Whether or not the command should be caps sensitive. If this is nil, the command will remain caps sensitive or not caps sensitive depending on what it was set to beforehand
+		---@param new_prefix string|nil The new prefix of the command. For example: If the prefix is "addon", players will need to type "?addon (command_name)" in chat to activate the command. If nil, prefixes won't be used for this command
 		---@param new_callback function|nil The function that will be called upon a player typing the command. If this is nil, the command callback will not be changed
 		---@return table command The command itself
-		edit = function(self, new_command_name, new_shorthands, new_caps_sensitive, new_callback)
+		edit = function(self, new_command_name, new_shorthands, new_caps_sensitive, new_prefix, new_callback)
 			self.properties.command_name = new_command_name or self.properties.command_name
 			self.properties.shorthands = new_shorthands or self.properties.shorthands
-			self.properties.callback = new_callback or self.properties.callback
 			self.properties.caps_sensitive = new_caps_sensitive or self.properties.caps_sensitive
+			self.properties.prefix = new_prefix or self.properties.prefix
+			self.properties.callback = new_callback or self.properties.callback
 
 			return self
 		end,
@@ -1526,9 +1531,20 @@ end
 
 ---Manage commands [BACKEND]
 cuhFramework.callbacks.onCustomCommand:connect(function(msg, peer_id, is_admin, is_auth, command, ...)
+	local args = {...}
 	command = command:sub(2, #command) --"?hey" becomes "hey"
 
 	for i, v in pairs(cuhFramework.commands.registeredCommands) do
+		local lookFor = command
+
+		if v.prefix then
+			if lookFor ~= v.prefix then
+				goto continue
+			else
+				lookFor = args[1]
+			end
+		end
+
 		-- caps sensitive
 		if v.caps_sensitive then
 			if v.command_name == command or cuhFramework.utilities.table.valueInTable(v.shorthands, command) then
@@ -1540,6 +1556,8 @@ cuhFramework.callbacks.onCustomCommand:connect(function(msg, peer_id, is_admin, 
 				v.callback(msg, peer_id, is_admin, is_auth, command, ...)
 			end
 		end
+
+	    ::continue::
 	end
 end)
 
