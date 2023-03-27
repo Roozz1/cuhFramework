@@ -34,7 +34,11 @@ You can even **disconnect** the function, making it obsolete, by doing:
 ```lua
 connection:disconnect() -- The function will no longer get fired when a vehicle is spawned
 ```
-(Inspired by Roblox)
+(Callbacks system inspired by Roblox)
+
+## *Examples*
+
+Want to see some examples that show you how to use the cuhFramework? If so, [click here](https://github.com/Roozz1/cuhFramework/tree/main).
 
 ## *Disclaimers*
 
