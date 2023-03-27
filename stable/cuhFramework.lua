@@ -2,6 +2,7 @@
     --cuhFramework || An addon creation framework to make SW addon development easier. 
 	-- 		Created by cuh4#7366
 	--		cuhHub - Stormworks Server Hub: https://discord.gg/zTQxaZjwDr
+	--		This framework is open-source: https://github.com/Roozz1/cuhFramework
 ------------------------------------------------------------------------
 --[[
 	------
@@ -9,7 +10,7 @@
 	------
 	This is the cuhFramework.lua file, which contains the cuhFramework (duh).
 	It is HIGHLY recommended that you code your addon in a different .lua file (script.lua or another file),
-	then when you are ready, run 'build.exe' to combine your code with this framework to use in-game.
+	then when you are ready, run 'cF-build.exe' to combine your code with this framework ready to use in-game.
 
 	It is highly recommended that you use the popular Lua LSP extension on VSCode,
 	and it is also highly recommended that you use NameousChangey's "Stormworks Lua with LifeboatAPI"
@@ -23,6 +24,8 @@
 	------
 	Documentation:
 	------
+	This may be outdated, please check the wiki at https://github.com/Roozz1/cuhFramework instead.
+
 	Before we get deeper into this documentation, a few warnings:
 		- This framework DOESN'T contain every single Stormworks function, you may have to use regular Addon Lua functions there and then.
 		- Some documentation may be missing, if that is the case, join the Discord at the top and ping me (cuh4) for help.
@@ -1135,7 +1138,7 @@ cuhFramework.utilities.string = {}
 
 ---Converts a string into a table, same as Python's split() function, from: https://stackoverflow.com/questions/1426954/split-string-in-lua
 ---@param str string String to split
----@param sep string Pattern to split the string by
+---@param sep string|nil Pattern to split the string by
 ---@return table split_string The split string in a table
 cuhFramework.utilities.string.split = function(str, sep)
 	if sep == nil then
@@ -1609,9 +1612,8 @@ cuhFramework.players.connectedPlayers = {
 		end,
 
 		---Returns the position of this player
-		---@return SWMatrix playerPosition The matrix position of this player
-		---@return boolean success Whether or not the position of this player was retrieved successfully
-		get_position = function(self, pos)
+		---@return SWMatrix player_position The position of this player
+		get_position = function(self)
 		end,
 
 		---Gives/Removes admin from this player
@@ -1750,24 +1752,3 @@ end
 -- Addon Code
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
-
--- cuh everything ;)
-local my_command = cuhFramework.commands.create("my_command", {"mc", "m_c"}, function()
-    cuhFramework.utilities.chat.send_message("myAddon", "someone activated my command")
-end, false)
-
-my_command:edit("new_command", nil, false, function()
-    cuhFramework.utilities.chat.send_message("myaddon", "s")
-end)
-
-cuhFramework.utilities.delay.create(10, function()
-    cuhFramework.utilities.chat.send_message("guhh", "guhh")
-end)
-
-cuhFramework.callbacks.onPlayerSit:connect(function()
-    cuhFramework.utilities.chat.send_message("s", "s")
-end)
-
-cuhFramework.utilities.loop.create(5, function()
-    cuhFramework.utilities.chat.send_message("cuhh", "loop every 5 secs")
-end)
