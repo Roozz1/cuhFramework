@@ -6,6 +6,7 @@
 """
 	My Discord: cuh4#7366
 	cuhHub - Stormworks Server Hub: https://discord.gg/zTQxaZjwDr
+    https://github.com/Roozz1/cuhFramework
 """
 #//Imports\\#
 import time
@@ -33,22 +34,38 @@ def timedExit(duration: int|float):
 
 def build(script_file: str):    
     # stage 1 - get script contents
-    content = ""
-    with open(script_file, "r") as f:
-        content = f.read()
+    try:
+        content = ""
+        with open(script_file, "r") as f:
+            content = f.read()
+    except:
+        alert(f"Failed to read {script_file}.")
+        timedExit(3)
         
     # stage 2 - get framework contents
     framework_content = ""
-    with open(framework_file, "r") as f:
-        framework_content = f.read()
+    try:
+        with open(framework_file, "r") as f:
+            framework_content = f.read()
+    except:
+        alert(f"Failed to read {framework_file}. Is {framework_file} in the same path as {__file__}?")
+        timedExit(3)
         
     # stage 3 - backup user's script
-    with open(f"backup_{script_file}", "w") as f:
-        f.write(content)
+    try:
+        with open(f"backup_{script_file}", "w") as f:
+            f.write(content)
+    except:
+        alert(f"Failed to backup {script_file}.")
+        timedExit(3)
         
     # stage 4 - combine
-    with open(build_file_name, "w") as f:
-        f.write(f"{framework_content}\n\n{content}")
+    try:
+        with open(build_file_name, "w") as f:
+            f.write(f"{framework_content}\n\n{content}")
+    except:
+        alert(f"Failed to combine {script_file} with {framework_file}.")
+        timedExit(3)
 
 #//Main\\#
 # Credit
@@ -56,6 +73,7 @@ print("""-----------------------------------------------------------------------
 cuhFramework || An addon creation framework to make SW addon development easier.
     Created by cuh4#7366
     cuhHub - Stormworks Server Hub: https://discord.gg/zTQxaZjwDr
+    https://github.com/Roozz1/cuhFramework
 ------------------------------------------------------------------------""")
 
 # Safety Checks

@@ -2,6 +2,7 @@
     --cuhFramework || An addon creation framework to make SW addon development easier. 
 	-- 		Created by cuh4#7366
 	--		cuhHub - Stormworks Server Hub: https://discord.gg/zTQxaZjwDr
+	--		This framework is open-source: https://github.com/Roozz1/cuhFramework
 ------------------------------------------------------------------------
 --[[
 	------
@@ -23,6 +24,8 @@
 	------
 	Documentation:
 	------
+	This may be outdated, please check the wiki at https://github.com/Roozz1/cuhFramework instead.
+
 	Before we get deeper into this documentation, a few warnings:
 		- This framework DOESN'T contain every single Stormworks function, you may have to use regular Addon Lua functions there and then.
 		- Some documentation may be missing, if that is the case, join the Discord at the top and ping me (cuh4) for help.
