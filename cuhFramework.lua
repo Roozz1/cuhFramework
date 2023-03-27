@@ -1612,9 +1612,8 @@ cuhFramework.players.connectedPlayers = {
 		end,
 
 		---Returns the position of this player
-		---@return SWMatrix playerPosition The matrix position of this player
-		---@return boolean success Whether or not the position of this player was retrieved successfully
-		get_position = function(self, pos)
+		---@return SWMatrix player_position The position of this player
+		get_position = function(self)
 		end,
 
 		---Gives/Removes admin from this player
