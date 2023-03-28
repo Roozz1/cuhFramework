@@ -2057,9 +2057,10 @@ end
 ---@class ui_data
 ---@field x integer horizontal_offset, -1 = left, 1 = right
 ---@field y integer vertical_offset, -1 = bottom, 1 = top
----@field text string The text this UI is showing
----@field player player|nil The player that the UI is being shown to. Nil if everyone
----@field id integer The ID of this UI
+---@field text string The text this UI object is showing
+---@field player player|nil The player that this UI object is being shown to. Nil if everyone
+---@field id integer The ID of this UI object
+---@field visible boolean Whether or not this UI object is visible
 
 ------------------------
 ------Screen UI
@@ -2082,6 +2083,7 @@ cuhFramework.ui.screen.create = function(id, text, x, y, player)
 		text = text,
 		player = player,
 		id = id,
+		visible = true
 	}
 
 	local peer_id = -1
@@ -2118,6 +2120,8 @@ cuhFramework.ui.screen.create = function(id, text, x, y, player)
 			if new_player and new_player == -1 then
 				self.properties.player = nil
 			end
+
+			self:setVisibility(self.properties.visible) -- refresh ui
 		end,
 
 		---Set the visibility of this UI
@@ -2131,6 +2135,7 @@ cuhFramework.ui.screen.create = function(id, text, x, y, player)
 			end
 
 			cuhFramework.references.createScreenPopup(v_peer_id, self.properties.id, "", shouldShow, self.properties.text, self.properties.x, self.properties.y)
+			self.properties.visible = shouldShow
 		end
 	}
 end
