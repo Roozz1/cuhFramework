@@ -1215,6 +1215,14 @@ cuhFramework.utilities.number.tonumber = function(input)
 	return tonumber(input)
 end
 
+---Round a number
+---@param input number The number to round (if string, it will be converted to a number)
+---@param numDecimalPlaces integer Amount of decimal places to round to
+---@return number|nil roundedNumber The rounded number
+cuhFramework.utilities.number.round = function(input, numDecimalPlaces)
+	return tonumber(string.format("%."..numDecimalPlaces.. "f", input))
+end
+
 ---Clamps a number between two numbers
 ---@param number number The number to clamp
 ---@param minimum number The minimum value the number can be
