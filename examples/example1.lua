@@ -18,6 +18,11 @@ cuhFramework.utilities.loop.create(6, function()
     local target_player_position = target_player:get_position() -- get the position of the host
     local object = cuhFramework.objects.spawnObject(target_player_position, 1) -- Spawn an object at the host's position
 
+    -- If the object failed to spawn (usually when we enter a value incorrectly), we end the function here
+    if not object then
+        return
+    end
+
     -- Announce something in chat after 1 second has passed
     cuhFramework.utilities.delay.create(1, function()
         cuhFramework.chat.send_message("Bob", "Guys! I just sent a message to the host of this server AND gave him an object!", -1)

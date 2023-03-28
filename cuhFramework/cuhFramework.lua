@@ -1776,6 +1776,11 @@ cuhFramework.objects.spawnedObjects = {}
 ---@param object_type SWObjectTypeEnum The object to spawn
 cuhFramework.objects.spawnObject = function(matrix, object_type)
 	local obj_id, success = server.spawnObject(matrix, object_type)
+
+	if not success then
+		return
+	end
+
 	cuhFramework.objects.spawnedObjects[obj_id] = matrix
 
 	return {
