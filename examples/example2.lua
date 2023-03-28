@@ -7,8 +7,12 @@
 --------- Example:
 local my_command
 my_command = cuhFramework.commands.create("purge", {"p"}, false, "myaddon", function(msg, peer_id, admin, auth, command, ...)
-    -- Pack all command args into a table
+    -- Pack all command args into a table (unused in this, but this is how you get command arguments)
     local args = {...}
+
+    -- Since we have a prefix, args[1] would be the actual command, while command would be the prefix, so let's shift things around
+    command = args[1]
+    args[1] = nil
 
     -- Clear chat for everyone when this command is activated
     cuhFramework.chat.clear()
