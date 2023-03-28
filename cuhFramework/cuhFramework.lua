@@ -1631,6 +1631,7 @@ end
 ---@field setAuth function<player, boolean> Gives this player auth/Removes it
 ---@field giveItem function<player, SWSlotNumberEnum, SWEquipmentTypeEnum, integer, integer, float, boolean|nil> Gives this player an item
 ---@field removeItem function<player, SWSlotNumberEnum> Removes an item in the specified slot from this player
+---@field hasItem function<player, SWSlotNumberEnum> Whether or not this player has an item in a slot
 
 ------------------------
 ------Players
@@ -1694,6 +1695,11 @@ cuhFramework.backend.givePlayerData = function(steam_id, name, peer_id, is_admin
 		removeItem = function(self, slot)
 			local char_id = server.getPlayerCharacterID(self.properties.peer_id)
 			return server.setCharacterItem(char_id, slot, 0, false, 0, 0)
+		end,
+
+		hasItem = function(self, slot)
+			local char_id = server.getPlayerCharacterID(self.properties.peer_id)
+			return server.getCharacterItem(char_id, slot) ~= 0
 		end,
 
 		kill = function(self)
