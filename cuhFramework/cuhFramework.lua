@@ -1732,25 +1732,12 @@ end
 ----------------------------------------
 ---@type table<string, any>
 cuhFramework.tps.tpsData = {
-	---Average Server TPS
-	---@type number
-	average = 62.0,
+	averageTPS = 62.0,
+	serverTPS = 62.0,
 
-	---Server TPS
-	---@type number
-	tps = 62.0,
-
-	---Ignore
-	---@type integer
 	ticks = 0,
-
-	---Ignore
-	---@type number
-	ticks_time = 0, ---Ignore
-
-	---Ignore
-	---@type table<integer, number>
-	backend_avgTpsTable = {} ---Ignore
+	ticks_time = 0,
+	backend_avgTpsTable = {}
 }
 
 -- Update TPS [Backend]
@@ -1758,15 +1745,15 @@ cuhFramework.backend.updates:insert(function()
 	cuhFramework.tps.tpsData.ticks  = cuhFramework.tps.tpsData.ticks  + 1
 
     if server.getTimeMillisec() - cuhFramework.tps.tpsData.ticks_time >= 500 then
-        cuhFramework.tps.tpsData.tps = cuhFramework.tps.tpsData.ticks  * 2
+        cuhFramework.tps.tpsData.serverTPS = cuhFramework.tps.tpsData.ticks  * 2
         cuhFramework.tps.tpsData.ticks = 0
         cuhFramework.tps.tpsData.ticks_time = server.getTimeMillisec()
     end
 
 	if #cuhFramework.tps.tpsData.backend_avgTpsTable <= 120 then
-		cuhFramework.utilities.table.insert(cuhFramework.tps.tpsData.backend_avgTpsTable, cuhFramework.tps.tpsData.tps)
+		cuhFramework.utilities.table.insert(cuhFramework.tps.tpsData.backend_avgTpsTable, cuhFramework.tps.tpsData.serverTPS)
 	else
-		cuhFramework.tps.tpsData.average = cuhFramework.utilities.table.sumOfTable(cuhFramework.tps.tpsData.backend_avgTpsTable) / #cuhFramework.tps.tpsData.backend_avgTpsTable
+		cuhFramework.tps.tpsData.averageTPS = cuhFramework.utilities.table.sumOfTable(cuhFramework.tps.tpsData.backend_avgTpsTable) / #cuhFramework.tps.tpsData.backend_avgTpsTable
 		cuhFramework.tps.tpsData.backend_avgTpsTable = {}
 	end
 end)
