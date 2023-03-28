@@ -15,5 +15,5 @@ cuhFramework.utilities.loop.create(1, function()
 	local actualTps = cuhFramework.utilities.number.round(tpsData.serverTPS, 1) -- Server TPS
 
 	-- Now that we have the average and actual TPS, let's go ahead and make a popup that shows the TPS
-	ui:edit("--TPS--\nTPS: "..actualTps.."\nAVG: "..averageTps, nil, nil, nil) -- As easy as that
+	ui:edit("--TPS--\nTPS: "..actualTps.."\nAVG: "..averageTps) -- As easy as that
 end)
