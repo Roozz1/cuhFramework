@@ -6,8 +6,8 @@
 - object zones
 - character zones
 - creature zones
-- getRandomValue() in utilities.table
 
+- getRandomValue() in utilities.table (done)
 - tps stuff (done)
 - creatures (done)
 - objects (done)
