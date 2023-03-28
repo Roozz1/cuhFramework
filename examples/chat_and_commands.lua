@@ -6,7 +6,7 @@
 ------------------------------------------------------------------------
 --------- Example:
 local my_command
-my_command = cuhFramework.commands.create("purge", {"p"}, false, "myaddon", function(msg, peer_id, admin, auth, command, ...)
+my_command = cuhFramework.commands.create("purge", {"p"}, false, "myaddon", function(msg, peer_id, admin, auth, command, ...) -- When a player types "?myaddon purge", this command is executed
     -- Pack all command args into a table (unused in this, but this is how you get command arguments)
     local args = {...}
 

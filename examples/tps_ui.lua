@@ -6,6 +6,8 @@
 ------------------------------------------------------------------------
 --------- Example:
 -- Create a loop that runs every one second
+local ui = cuhFramework.ui.screen.create(1, "--TPS--\nLoading...", -0.9, 0)
+
 cuhFramework.utilities.loop.create(1, function()
 	-- Get TPS data
 	local tpsData = cuhFramework.tps.getTPSData()
@@ -13,5 +15,5 @@ cuhFramework.utilities.loop.create(1, function()
 	local actualTps = cuhFramework.utilities.number.round(tpsData.serverTPS, 1) -- Server TPS
 
 	-- Now that we have the average and actual TPS, let's go ahead and make a popup that shows the TPS
-	cuhFramework.references.createScreenPopup(-1, 1, "TPS", true, "--TPS--\nAvg: "..averageTps.."\nTPS: "..actualTps, -0.9, 0) -- No functions for UI (yet), so we are using a reference to server.setPopupScreen()
+	ui:edit("--TPS--\nTPS: "..actualTps.."\nAVG: "..averageTps, nil, nil, nil) -- As easy as that
 end)
