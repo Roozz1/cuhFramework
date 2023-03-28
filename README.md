@@ -5,12 +5,12 @@ cuh4#7366  **|**  cuhHub - Stormworks Server Hub: https://discord.gg/zTQxaZjwDr
 
 ## *Information*
 
-cuhFramework, a framework that should greatly improve the ease of addon development within the game Stormworks: Build and Rescue.
+cuhFramework, a clean organised framework that should greatly improve the ease of addon development within the game Stormworks: Build and Rescue.
 
 Compatible with intellisense.
 
 
-The framework comes with many utility functions, like chat functions, table functions, string functions (see below), loop and delay functions, and more.
+The framework comes with many utility functions for table management, string management, game chat, and more.
 ```lua
 local converted = cuhFramework.utilities.string.split("the input string", " ") -- {"the" "input" "string"}
 local converted2 = cuhFramework.utilities.string.split("the input string") -- {"the" "input" "string"}
@@ -26,7 +26,7 @@ end
 ```
 You can do:
 ```lua
-local connection = cuhFramework.callbacks.onVehicleSpawn:connect(function()
+local connection = cuhFramework.callbacks.onVehicleSpawn:connect(function(...)
     -- Your code
 end)
 ```
@@ -35,6 +35,14 @@ You can even **disconnect** the function, making it obsolete, by doing:
 connection:disconnect() -- The function will no longer get called when a vehicle is spawned
 ```
 (Callbacks system inspired by Roblox)
+
+## *Download*
+To download this framework, head over to the [releases](https://github.com/Roozz1/cuhFramework/releases/tag/Stable).
+Keep in mind, this framework is still a **work-in-progress**, while there are a lot of features so far, there are a lot more to come.
+
+To add cuhFramework into your code, simply add **cuhFramework.lua** and **cuhFramework - Build Project.exe** into the **same** folder as your addon. Then when you would like to combine your addon with the framework code, run the .exe.
+
+> ⚠ **Your addon code is backed up during the building process, your raw addon code will not be lost unless you do something horribly wrong.**
 
 ## *Documentation*
 [Click here](https://github.com/Roozz1/cuhFramework/wiki) for the documentation.
@@ -45,7 +53,7 @@ Want to see some examples that show you how to use this? If so, [click here](htt
 
 ## *Disclaimers*
 
-It is **highly recommended** that you code your addon in a different .lua file to cuhFramework.lua (script.lua or another file).
+It is **highly recommended** that you code your addon in a **different** .lua file to **cuhFramework.lua** (preferably a file that **isnt script.lua nor cuhFramework.lua**).
 
 
 It is also **highly recommended** that you use the popular Lua LSP extension by sumneko on VSCode, and it is also **recommended** that you use NameousChangey's Stormworks Lua with LifeboatAPI
