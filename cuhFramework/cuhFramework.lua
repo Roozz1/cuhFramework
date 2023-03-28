@@ -1216,11 +1216,11 @@ cuhFramework.utilities.number.tonumber = function(input)
 end
 
 ---Round a number
----@param input number The number to round (if string, it will be converted to a number)
+---@param input number The number to round
 ---@param numDecimalPlaces integer Amount of decimal places to round to
----@return number|nil roundedNumber The rounded number
+---@return number roundedNumber The rounded number, or 0 if rounding error
 cuhFramework.utilities.number.round = function(input, numDecimalPlaces)
-	return tonumber(string.format("%."..numDecimalPlaces.. "f", input))
+	return tonumber(string.format("%."..numDecimalPlaces.. "f", input)) or 0
 end
 
 ---Clamps a number between two numbers
