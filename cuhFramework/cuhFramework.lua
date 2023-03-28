@@ -1752,11 +1752,11 @@ cuhFramework.backend.updates:insert(function()
     end
 
 	-- get average tps
-	if #cuhFramework.tps.tpsData.averageTpsTable <= 120 then
-		cuhFramework.utilities.table.insert(cuhFramework.tps.tpsData.averageTpsTable, cuhFramework.tps.tpsData.tps) -- insert current tps value into average tps table
+	if #cuhFramework.tps.tpsData.backend_avgTpsTable <= 120 then
+		cuhFramework.utilities.table.insert(cuhFramework.tps.tpsData.backend_avgTpsTable, cuhFramework.tps.tpsData.tps) -- insert current tps value into average tps table
 	else
-		cuhFramework.tps.tpsData.average = cuhFramework.utilities.table.sumOfTable(cuhFramework.tps.tpsData.averageTpsTable) / #cuhFramework.tps.tpsData.averageTpsTable -- get average tps
-		cuhFramework.tps.tpsData.averageTpsTable = {} -- reset
+		cuhFramework.tps.tpsData.average = cuhFramework.utilities.table.sumOfTable(cuhFramework.tps.tpsData.backend_avgTpsTable) / #cuhFramework.tps.tpsData.backend_avgTpsTable -- get average tps
+		cuhFramework.tps.tpsData.backend_avgTpsTable = {} -- reset
 	end
 end)
 
@@ -2106,6 +2106,8 @@ end
 ---@param id integer The ID of the zone
 ---@return nil
 cuhFramework.customZones.remove = function(id)
+	local zone = cuhFramework.customZones.activeZones[id]
+	zone.backend_loop:remove()
 	cuhFramework.customZones.activeZones[id] = nil
 end
 
