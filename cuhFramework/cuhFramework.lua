@@ -1193,16 +1193,9 @@ cuhFramework.utilities.number.tointeger = function(num)
 	return math.floor(num)
 end
 
----Converts any number into a float
----@param num number The number to convert into a float
----@return float float The new float
-cuhFramework.utilities.number.tofloat = function(num)
-	return cuhFramework.utilities.number.tonumber(cuhFramework.utilities.string.tostring(num)..".0")
-end
-
 ---Converts a string/bool into a number
 ---@param input string|bool|number The number to convert into a float
----@return number number The new number
+---@return number number The new number, or 0 if failure
 cuhFramework.utilities.number.tonumber = function(input)
 	if type(input) == "bool" then
 		if input then
@@ -1212,7 +1205,7 @@ cuhFramework.utilities.number.tonumber = function(input)
 		end
 	end
 
-	return tonumber(input)
+	return tonumber(input) or 0
 end
 
 ---Round a number
