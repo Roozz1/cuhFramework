@@ -2,3 +2,7 @@
 - more references
 - savedata functions
 - disaster functions
+- vehicle zones
+- object zones
+- character zones
+- creature zones
