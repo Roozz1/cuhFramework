@@ -1111,6 +1111,13 @@ cuhFramework.utilities.table.insert = function(tbl, value)
 	table.insert(tbl, value)
 end
 
+---Get a random value in a table
+---@param tbl table Table to get a random value from
+---@return any randomTableValue The random table value
+cuhFramework.utilities.table.getRandomValue = function(tbl)
+	return tbl[math.random(1, #tbl)]
+end
+
 ---Swap the values of a table with the index of the value
 ---@param tbl table Table to apply the result of this function to
 ---@return table newTable The new table with all values as the index, and all indexes as the values
