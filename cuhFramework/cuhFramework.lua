@@ -42,6 +42,7 @@ cuhFramework = {
 	saveData = {},
 	tps = {},
 	customZones = {},
+	ui = {},
 
 	utilities = {},
 	callbacks = {},
@@ -1556,9 +1557,9 @@ end)
 ---Sends a message into chat
 ---@param author string The orange text in chat, if author was "Bob", in chat, it would look like: "Bob			(message here)"
 ---@param message string|table What to send in chat (can be a string or a table)
----@param peer_id number|nil The peer to send the message to, -1 = all. If this is nil, the peer_id will become -1
+---@param player player|nil The player to send the message to. If this is nil, the message will be sent to everyone
 ---@return nil
-cuhFramework.chat.send_message = function(author, message, peer_id)
+cuhFramework.chat.send_message = function(author, message, player)
 	local msg = ""
 
 	if type(message) == "table" then
@@ -1567,15 +1568,19 @@ cuhFramework.chat.send_message = function(author, message, peer_id)
 		msg = message
 	end
 
-	server.announce(author, msg, peer_id)
+	if player then
+		server.announce(author, msg, player.properties.peer_id)
+	else
+		server.announce(author, msg)
+	end
 end
 
 ---Clears the chat by sending 11 blank messages
----@param peer_id integer|nil Clear the chat for the player with this peer ID. If this is nil, it becomes -1, which is everyone
+---@param player player|nil The player to clear chat for. If this is nil, chat will be cleared for everyone
 ---@return nil
-cuhFramework.chat.clear = function(peer_id)
+cuhFramework.chat.clear = function(player)
 	for _ = 1, 11 do
-		cuhFramework.chat.send_message("", " ", peer_id)
+		cuhFramework.chat.send_message("", " ", player)
 	end
 end
 
@@ -1598,7 +1603,7 @@ end
 ---@class player
 ---@field properties playerProperties The properties of this player
 ---@field kick function<player, nil> Kick this player
----@field ban function<player, nil> Kick this player
+---@field ban function<player, nil> Ban this player
 ---@field kill function<player, nil> Kills this player
 ---@field teleport function<player, SWMatrix> Teleport this player to a position
 ---@field fake_chat function<player, string, integer|nil> Send a fake message that seems like this player sent it
@@ -2042,9 +2047,117 @@ end
 
 ----------------------------------------
 ----------------------------------------
+--//Framework - UI\\--
+----------------------------------------
+----------------------------------------
+
+------------------------
+------Intellisense
+------------------------
+---@class ui_data
+---@field x integer horizontal_offset, -1 = left, 1 = right
+---@field y integer vertical_offset, -1 = bottom, 1 = top
+---@field text string The text this UI is showing
+---@field player player|nil The player that the UI is being shown to. Nil if everyone
+---@field id integer The ID of this UI
+
+------------------------
+------Screen UI
+------------------------
+---@type table<integer, ui_data>
+cuhFramework.ui.activeUI = {}
+
+---Create a screen UI object for a player
+---@param id integer The ID of the UI object
+---@param text string The text that should be in the UI (can be updated)
+---@param x number -1 = left, 1 = right
+---@param y number -1 = bottom, 1 = top
+---@param player player|nil The player to show this UI object to
+cuhFramework.ui.screen.create = function(id, text, x, y, player)
+	cuhFramework.ui.activeUI[id] = {
+		x = x,
+		y = y,
+		text = text,
+		player = player,
+		id = id,
+	}
+
+	local peer_id = -1
+
+	if player then
+		peer_id = player.properties.peer_id
+	end
+
+	cuhFramework.references.createScreenPopup(peer_id, id, "", true, text, x, y)
+
+	return {
+		---@type ui_data
+		properties = cuhFramework.ui.activeUI[id],
+
+		---Remove this UI
+		---@return nil
+		remove = function(self)
+			return cuhFramework.ui.screen.remove(self.properties.index)
+		end,
+
+		---Edit this UI
+		---@param new_text SWMatrix|nil What the new text should be, set to nil if you don't want to change
+		---@param new_x number|nil What the new X should be, set to nil if you don't want to change
+		---@param new_y number|nil What the new Y should be, set to nil if you don't want to change
+		---@param new_player player|nil The player to show this UI to. Set to nil if you don't want to change, or set to -1 if you want to show this UI object to all
+		---@return nil
+		edit = function(self, new_text, new_x, new_y, new_player)
+			self.properties.x = new_x or self.properties.x
+			self.properties.y = new_y or self.properties.y
+			self.properties.text = new_text or self.properties.text
+
+			self.properties.player = new_player or self.properties.player
+
+			if new_player and new_player == -1 then
+				self.properties.player = nil
+			end
+		end,
+
+		---Set the visibility of this UI
+		---@param shouldShow boolean If true, the UI will be shown. Opposite if false.
+		---@return nil
+		setVisibility = function(self, shouldShow)
+			local v_peer_id = -1
+
+			if self.properties.player then
+				v_peer_id = self.properties.player.properties.peer_id
+			end
+
+			cuhFramework.references.createScreenPopup(v_peer_id, self.properties.id, "", shouldShow, self.properties.text, self.properties.x, self.properties.y)
+		end
+	}
+end
+
+---Remove a screen UI object
+---@param id integer The ID of the UI object
+---@return nil
+cuhFramework.ui.screen.remove = function(id)
+	local uiObject = cuhFramework.ui.activeUI[id]
+
+	if not uiObject then
+		return
+	end
+
+	if uiObject.player then
+		cuhFramework.references.removePopup(uiObject.player.properties.peer_id, id)
+	else
+		cuhFramework.references.removePopup(-1, id)
+	end
+
+	cuhFramework.ui.activeUI[id] = nil
+end
+
+----------------------------------------
+----------------------------------------
 --//Framework - Custom Zones\\--
 ----------------------------------------
 ----------------------------------------
+
 ------------------------
 ------Intellisense
 ------------------------
