@@ -7,11 +7,14 @@
 --------- Example:
 -- Note: host = player with peer_id 0, aka the player that created the server, or the server itself in dedicated servers
 cuhFramework.utilities.loop.create(6, function()
-    cuhFramework.chat.clear(0) -- clear chat for the host
-
-    -- Get host, and send messages
+    -- Get host
     local target_player = cuhFramework.players.getPlayerByPeerId(0) -- get host's player data
-    cuhFramework.chat.send_message("Bob", "Hey "..target_player.properties.name.."! Take my object!", 0) -- Send a message to the host, saying "Hey (name of host player)! Take my object!"
+
+    -- Clear chat
+    cuhFramework.chat.clear(target_player) -- Only for the host
+
+    -- Send messages
+    cuhFramework.chat.send_message("Bob", "Hey "..target_player.properties.name.."! Take my object!", target_player) -- Send a message to the host, saying "Hey (name of host player)! Take my object!"
     target_player:fake_chat("Thanks for the object, Bob!") -- Send a fake message that seems like it was sent by the host
 
     -- Spawn an object at the host's position
@@ -25,8 +28,7 @@ cuhFramework.utilities.loop.create(6, function()
 
     -- Announce something in chat after 1 second has passed
     cuhFramework.utilities.delay.create(1, function()
-        cuhFramework.chat.send_message("Bob", "Guys! I just sent a message to the host of this server AND gave him an object!", -1)
-        -- cuhFramework.chat.send_message("Bob", "Guys! I just sent a message to the host of this server AND gave him an object!", -1) -- not specifying a peer_id will just set the peer_id to -1, so this does the same as the line above
+        cuhFramework.chat.send_message("Bob", "Guys! I just sent a message to the host of this server AND gave him an object!") -- Since a player wasn't specified, this message will be sent to all players
     end)
 
     -- Despawn the object after some time
