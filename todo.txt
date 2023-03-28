@@ -12,3 +12,6 @@
 - objects (done)
 - characters (done)
 - matrix utility functions (done)
+- rename examples (done)
+- one more example (done)
+- remove tofloat (done)
