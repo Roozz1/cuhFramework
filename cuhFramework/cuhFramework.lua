@@ -1599,7 +1599,7 @@ end
 cuhFramework.players.connectedPlayers = {}
 
 -- Update connectedPlayers [Backend]
-cuhFramework.callbacks.onPlayerJoin:connect(function(steam_id, name, peer_id, is_admin, is_auth)
+cuhFramework.backend.givePlayerData = function(steam_id, name, peer_id, is_admin, is_auth)
 	local data = {
 		properties = {
 			peer_id = peer_id,
@@ -1664,7 +1664,15 @@ cuhFramework.callbacks.onPlayerJoin:connect(function(steam_id, name, peer_id, is
 	}
 
 	cuhFramework.players.connectedPlayers[peer_id] = data
+end
+
+cuhFramework.callbacks.onPlayerJoin:connect(function(...)
+	cuhFramework.backend.givePlayerData(...)
 end)
+
+for i, v in pairs(server.getPlayers()) do
+	cuhFramework.backend.givePlayerData(v.steam_id, v.name, v.id, v.admin, v.auth)
+end
 
 cuhFramework.callbacks.onPlayerLeave:connect(function(steam_id, name, peer_id, is_admin, is_auth)
 	cuhFramework.utilities.delay.create(0.05, function() -- wait some time before removing data, that way addon creators can get player data when they leave
