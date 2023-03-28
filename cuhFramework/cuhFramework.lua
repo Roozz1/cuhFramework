@@ -6,14 +6,15 @@
 ------------------------------------------------------------------------
 --[[
 	------
-	Setup
+	Information
 	------
-	This is the cuhFramework.lua file, which contains the cuhFramework (duh).
+	This is the cuhFramework.lua file, which contains the entirety of cuhFramework.
 	It is HIGHLY recommended that you code your addon in a different .lua file (script.lua or another file),
-	then when you are ready, run 'cF-build.exe' to combine your code with this framework ready to use in-game.
+	then when you are ready, run 'cuhFramework - Build Project.exe' to combine your code with this framework,
+	ready to use in-game.
 
 	It is highly recommended that you use the popular Lua LSP extension on VSCode,
-	and it is also highly recommended that you use NameousChangey's "Stormworks Lua with LifeboatAPI"
+	and it is also highly recommended that you use NameousChangey's Stormworks Lua with LifeboatAPI
 	VSCode Extension.
 
 	If you're not already, make sure to code your addon with something like VSCode, and do not use the in-game
