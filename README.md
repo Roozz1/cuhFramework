@@ -71,3 +71,5 @@ VSCode Extension.
 6. Lua-LSP VSCode extension by sumneko compatible
 7. Build feature, combines your addon code with cuhFramework, allowing you to code your addon without a lot of lines being taken by cuhFramework
 8. Works with intellisense (use Lua-LSP VSCode extension by sumneko for this)
+9. Completely organised
+10. Easy to integrate into your code
