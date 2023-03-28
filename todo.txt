@@ -6,6 +6,8 @@
 - object zones
 - character zones
 - creature zones
+- ui, physical and screen, also a function for hiding a player's screen
+- getRandomValue() in utilities.table
 
 - tps stuff (done)
 - creatures (done)
