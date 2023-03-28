@@ -17,3 +17,4 @@
 - one more example (done)
 - remove tofloat (done)
 - ui stuff (done)
+- switchbox utility function (done)

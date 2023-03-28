@@ -1259,6 +1259,18 @@ end
 ------------------------
 cuhFramework.utilities.miscellaneous = {}
 
+---Switch between two values depending on the state of something
+---@param off any The return value if switch is false
+---@param on any The return value if switch is true
+---@param switch boolean Switch between the off and on value
+cuhFramework.utilities.miscellaneous.switchbox = function(off, on, switch)
+	if switch == true then -- not using "if switch then" because i want switch to 100% be a bool
+		return on
+	elseif switch == false then
+		return off
+	end
+end
+
 ---Get the closest player to a position
 ---@param position SWMatrix The position to check
 ---@return player|nil
