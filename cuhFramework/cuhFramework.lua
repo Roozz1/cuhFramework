@@ -2029,34 +2029,40 @@ end
 --//Framework - Custom Zones\\--
 ----------------------------------------
 ----------------------------------------
-
 ------------------------
 ------Intellisense
 ------------------------
----@class customZone
+---@class player_customZone
 ---@field position SWMatrix The position of this zone
 ---@field size number The size of this zone
 ---@field callback function The callback that will be activated when a player enters/leaves the zone
 ---@field id integer The ID of this zone
 ---@field playersInZone table<integer, player> The players in this zone
 
-------------------------
-------Custom Zones
-------------------------
----@type table<integer, customZone>
-cuhFramework.customZones.activeZones = {}
+---@class vehicle_customZone
+---@field position SWMatrix The position of this zone
+---@field size number The size of this zone
+---@field callback function The callback that will be activated when a vehicle enters/leaves the zone
+---@field id integer The ID of this zone
+---@field vehiclesInZone table<integer, player> The vehicles in this zone
 
----Create a zone
+------------------------
+------Custom Zones (Player)
+------------------------
+---@type table<integer, player_customZone>
+cuhFramework.customZones.activePlayerZones = {}
+
+---Create a zone for players
 ---@param position SWMatrix The position the zone should be at
 ---@param size number The size of the zone in meters
 ---@param callback function The function that should be called when a player enters the zone. A player will be sent through the callback if a player enters/leaves the zone, along with a boolean. true = Player entered, false = Player left
-cuhFramework.customZones.create = function(position, size, callback)
+cuhFramework.customZones.createPlayerZone = function(position, size, callback)
 	if not callback then
 		return false
 	end
 
-	local id = #cuhFramework.customZones.activeZones + 1
-	cuhFramework.customZones.activeZones[id] = {
+	local id = #cuhFramework.customZones.activePlayerZones + 1
+	cuhFramework.customZones.activePlayerZones[id] = {
 		position = position,
 		size = size,
 		callback = callback,
@@ -2064,7 +2070,7 @@ cuhFramework.customZones.create = function(position, size, callback)
 		playersInZone = {},
 
 		backend_loop = cuhFramework.utilities.loop.create(0.02, function()
-			local zone = cuhFramework.customZones.activeZones[id]
+			local zone = cuhFramework.customZones.activePlayerZones[id]
 			for i, player in pairs(cuhFramework.players.connectedPlayers) do
 				local distance = matrix.distance(player:get_position(), zone.position)
 				if distance <= zone.size then
@@ -2084,12 +2090,12 @@ cuhFramework.customZones.create = function(position, size, callback)
 
 	return {
 		---@type customZone
-		properties = cuhFramework.customZones.activeZones[id],
+		properties = cuhFramework.customZones.activePlayerZones[id],
 
 		---Remove this zone
 		---@return nil
 		remove = function(self)
-			cuhFramework.customZones.remove(self.properties.id)
+			cuhFramework.customZones.removePlayerZone(self.properties.id)
 		end,
 
 		---Edit this zone
@@ -2108,10 +2114,10 @@ end
 ---Remove a zone
 ---@param id integer The ID of the zone
 ---@return nil
-cuhFramework.customZones.remove = function(id)
-	local zone = cuhFramework.customZones.activeZones[id]
+cuhFramework.customZones.removePlayerZone = function(id)
+	local zone = cuhFramework.customZones.activePlayerZones[id]
 	zone.backend_loop:remove()
-	cuhFramework.customZones.activeZones[id] = nil
+	cuhFramework.customZones.activePlayerZones[id] = nil
 end
 
 ----------------------------------------
