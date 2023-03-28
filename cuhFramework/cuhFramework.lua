@@ -2105,7 +2105,7 @@ cuhFramework.customZones.createPlayerZone = function(position, size, callback)
 	}
 
 	return {
-		---@type customZone
+		---@type player_customZone
 		properties = cuhFramework.customZones.activePlayerZones[id],
 
 		---Remove this zone
