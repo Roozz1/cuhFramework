@@ -1251,7 +1251,7 @@ cuhFramework.utilities.matrix = {}
 ---@param z number|nil Z offset
 ---@return SWMatrix newPosition The offset position
 cuhFramework.utilities.matrix.offsetPosition = function(position, x, y, z)
-	return matrix.translation(position[13] + (x or 0), position[14] +(y or 0), position[15] + (z or 0))
+	return cuhFramework.references.matrix.translation(position[13] + (x or 0), position[14] +(y or 0), position[15] + (z or 0))
 end
 
 ------------------------
@@ -2215,7 +2215,7 @@ cuhFramework.customZones.createPlayerZone = function(position, size, callback)
 		backend_loop = cuhFramework.utilities.loop.create(0.02, function()
 			local zone = cuhFramework.customZones.activePlayerZones[id]
 			for i, player in pairs(cuhFramework.players.connectedPlayers) do
-				local distance = matrix.distance(player:get_position(), zone.position)
+				local distance = cuhFramework.references.matrix.distance(player:get_position(), zone.position)
 				if distance <= zone.size then
 					if not zone.playersInZone[player.properties.peer_id] then
 						zone.playersInZone[player.properties.peer_id] = player
@@ -2254,8 +2254,19 @@ cuhFramework.customZones.createPlayerZone = function(position, size, callback)
 	}
 end
 
----Remove a zone
----@param id integer The ID of the zone
+---Whether or not a position is within a player zone
+---@param position SWMatrix The position to check
+---@return player_customZone|nil zone The player zone the position is in, or nil if no player zone was found
+cuhFramework.customZones.isPositionInPlayerZone = function(position)
+	for i, v in pairs(cuhFramework.customZones.activePlayerZones) do
+		if cuhFramework.references.matrix.distance(position, v.position) <= v.size then
+			return v
+		end
+	end
+end
+
+---Remove a player zone
+---@param id integer The ID of the player zone
 ---@return nil
 cuhFramework.customZones.removePlayerZone = function(id)
 	local zone = cuhFramework.customZones.activePlayerZones[id]
