@@ -62,7 +62,7 @@ def build(script_file: str):
     # stage 4 - combine
     try:
         with open(build_file_name, "w") as f:
-            f.write(f"{framework_content}\n\n{content}")
+            f.write(f"{framework_content}\n\n{content.replace("g_savedata", "g_savedata_overwritten")}")
     except:
         alert(f"Failed to combine {script_file} with {framework_file}.")
         timedExit(3)
