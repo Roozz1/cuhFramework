@@ -56,14 +56,14 @@ cuhFramework = {
 			---@param func function Function that should be called every tick
 			---@return nil
 			insert = function(self, func)
-				cuhFramework.utilities.table.insert(self, func)
+				table.insert(self, func)
 			end,
 
 			---Create an exception. The exception will not be called by onTick. Don't use this
 			---@param exception function The function to exclude
 			---@return nil
 			create_exception = function(self, exception)
-				cuhFramework.utilities.table.insert(self.exceptions, exception)
+				table.insert(self.exceptions, exception)
 			end,
 
 			exceptions = {}
