@@ -1231,6 +1231,21 @@ cuhFramework.utilities.number.clamp = function(number, minimum, maximum)
 end
 
 ------------------------
+------Matrix
+------------------------
+cuhFramework.utilities.matrix = {}
+
+---Offset position
+---@param position SWMatrix The position to offset
+---@param x number|nil X offset
+---@param y number|nil Y offset
+---@param z number|nil Z offset
+---@return SWMatrix newPosition The offset position
+cuhFramework.utilities.matrix.offsetPosition = function(position, x, y, z)
+	return matrix.translation(position[13] + (x or 0), position[14] +(y or 0), position[15] + (z or 0))
+end
+
+------------------------
 ------Miscellaneous
 ------------------------
 cuhFramework.utilities.miscellaneous = {}

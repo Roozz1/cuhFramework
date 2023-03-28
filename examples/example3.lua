@@ -23,11 +23,15 @@ if creature and character then -- The creature may not spawn if we have entered 
     end)
 end
 
--- Create a zone, if a player enters it, the player dies
-cuhFramework.customZones.createPlayerZone(host:get_position(), 10, function(player, entered)
+-- Create a zone next to the host, if a player enters it, the player dies
+local host_position = host:get_position()
+local newPos = cuhFramework.utilities.matrix.offsetPosition(host_position, 15, 0, 0) -- 15 meters to the right of the host
+
+cuhFramework.customZones.createPlayerZone(newPos, 10, function(player, entered)
 	if entered then -- A player entered the zone
         cuhFramework.chat.send_message("myAddon", player.properties.name.." entered this zone!")
         player:kill() -- Kill the player
+        cuhFramework.chat.send_message("myAddon", player.properties.name.." died... because he trepassed into this zone.")
     else -- A player left the zone
         cuhFramework.chat.send_message("myAddon", player.properties.name.." left this zone!")
     end
