@@ -2064,8 +2064,10 @@ end
 ------------------------
 ------Screen UI
 ------------------------
+cuhFramework.ui.screen = {}
+
 ---@type table<integer, ui_data>
-cuhFramework.ui.activeUI = {}
+cuhFramework.ui.screen.activeUI = {}
 
 ---Create a screen UI object for a player
 ---@param id integer The ID of the UI object
@@ -2074,7 +2076,7 @@ cuhFramework.ui.activeUI = {}
 ---@param y number -1 = bottom, 1 = top
 ---@param player player|nil The player to show this UI object to
 cuhFramework.ui.screen.create = function(id, text, x, y, player)
-	cuhFramework.ui.activeUI[id] = {
+	cuhFramework.ui.screen.activeUI[id] = {
 		x = x,
 		y = y,
 		text = text,
@@ -2092,7 +2094,7 @@ cuhFramework.ui.screen.create = function(id, text, x, y, player)
 
 	return {
 		---@type ui_data
-		properties = cuhFramework.ui.activeUI[id],
+		properties = cuhFramework.ui.screen.activeUI[id],
 
 		---Remove this UI
 		---@return nil
@@ -2137,7 +2139,7 @@ end
 ---@param id integer The ID of the UI object
 ---@return nil
 cuhFramework.ui.screen.remove = function(id)
-	local uiObject = cuhFramework.ui.activeUI[id]
+	local uiObject = cuhFramework.ui.screen.activeUI[id]
 
 	if not uiObject then
 		return
@@ -2149,7 +2151,7 @@ cuhFramework.ui.screen.remove = function(id)
 		cuhFramework.references.removePopup(-1, id)
 	end
 
-	cuhFramework.ui.activeUI[id] = nil
+	cuhFramework.ui.screen.activeUI[id] = nil
 end
 
 ----------------------------------------
