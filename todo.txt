@@ -6,3 +6,9 @@
 - object zones
 - character zones
 - creature zones
+
+- tps stuff (done)
+- creatures (done)
+- objects (done)
+- characters (done)
+- matrix utility functions (done)
