@@ -11,12 +11,12 @@ cuhFramework.utilities.loop.create(6, function()
 
     -- Get host, and send messages
     local target_player = cuhFramework.players.getPlayerByPeerId(0) -- get host's player data
-    cuhFramework.chat.send_message("Bob", "Hey "..target_player.properties.name.."! Take my object!", 0) -- send a message to the host, saying "Hey (name of host player)! Take my object!"
-    target_player:fake_chat("Thanks for the object, Bob!") -- send a fake message that seems like it was sent by the host
+    cuhFramework.chat.send_message("Bob", "Hey "..target_player.properties.name.."! Take my object!", 0) -- Send a message to the host, saying "Hey (name of host player)! Take my object!"
+    target_player:fake_chat("Thanks for the object, Bob!") -- Send a fake message that seems like it was sent by the host
 
     -- Spawn an object at the host's position
     local target_player_position = target_player:get_position() -- get the position of the host
-    local object = cuhFramework.objects.spawnObject(target_player_position, 1) -- spawn an object at the host's position
+    local object = cuhFramework.objects.spawnObject(target_player_position, 1) -- Spawn an object at the host's position
 
     -- Announce something in chat after 1 second has passed
     cuhFramework.utilities.delay.create(1, function()
@@ -26,6 +26,6 @@ cuhFramework.utilities.loop.create(6, function()
 
     -- Despawn the object after some time
     cuhFramework.utilities.delay.create(4, function()
-        object:despawn() -- despawn the object after 4 seconds
+        object:despawn() -- Despawn the object after 4 seconds
     end)
 end)
