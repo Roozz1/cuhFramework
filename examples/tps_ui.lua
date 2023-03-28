@@ -5,9 +5,10 @@
 	--		This framework is open-source: https://github.com/Roozz1/cuhFramework
 ------------------------------------------------------------------------
 --------- Example:
--- Create a loop that runs every one second
+-- Create a screen UI object
 local ui = cuhFramework.ui.screen.create(1, "--TPS--\nLoading...", -0.9, 0)
 
+-- Update it to show the TPS every second
 cuhFramework.utilities.loop.create(1, function()
 	-- Get TPS data
 	local tpsData = cuhFramework.tps.getTPSData()
