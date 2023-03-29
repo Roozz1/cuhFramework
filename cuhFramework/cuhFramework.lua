@@ -1216,12 +1216,13 @@ cuhFramework.utilities.number.tonumber = function(input)
 	return tonumber(input) or 0
 end
 
----Round a number
----@param input number The number to round
----@param numDecimalPlaces integer Amount of decimal places to round to
----@return number roundedNumber The rounded number, or 0 if rounding error
-cuhFramework.utilities.number.round = function(input, numDecimalPlaces)
-	return tonumber(string.format("%."..numDecimalPlaces.. "f", input)) or 0
+---Round a number 
+---@param input number The number to round 
+---@param numDecimalPlaces integer Amount of decimal places to round to 
+---@return number roundedNumber The rounded number, or 0 if rounding error 
+ cuhFramework.utilities.number.round = function(input, numDecimalPlaces)
+    local mult = 10 ^ (numDecimalPlaces or 0)
+    return math.floor(input * mult + 0.5) / mult
 end
 
 ---Clamps a number between two numbers
