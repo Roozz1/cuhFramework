@@ -1,5 +1,3 @@
-- vehicle functions
-- more references
 - savedata functions
 - disaster functions
 - vehicle zones
@@ -18,3 +16,5 @@
 - remove tofloat (done)
 - ui stuff (done)
 - switchbox utility function (done)
+- vehicle functions (done)
+- more references (done)

@@ -33,6 +33,7 @@
 --//Framework\\--
 ----------------------------------------
 ----------------------------------------
+
 cuhFramework = {
 	players = {},
 	vehicles = {},
@@ -77,6 +78,7 @@ cuhFramework = {
 --//Backend - Save Data\\--
 ----------------------------------------
 ----------------------------------------
+
 g_savedata = {}
 
 ----------------------------------------
@@ -84,6 +86,7 @@ g_savedata = {}
 --//Backend - Updates [DO NOT USE]\\--
 ----------------------------------------
 ----------------------------------------
+
 cuhFramework.backend.updates:create_exception(cuhFramework.backend.updates.create_exception)
 cuhFramework.backend.updates:create_exception(cuhFramework.backend.updates.insert)
 
@@ -92,6 +95,7 @@ cuhFramework.backend.updates:create_exception(cuhFramework.backend.updates.inser
 --//Framework - Callbacks\\--
 ----------------------------------------
 ----------------------------------------
+
 cuhFramework.callbacks.onTick = {
 	connections = {},
 	---Connect a callback to onTick
@@ -1574,6 +1578,7 @@ end)
 --//Framework - Chat\\--
 ----------------------------------------
 ----------------------------------------
+
 ---Sends a message into chat
 ---@param author string The orange text in chat, if author was "Bob", in chat, it would look like: "Bob			(message here)"
 ---@param message string|table What to send in chat (can be a string or a table)
@@ -1668,8 +1673,7 @@ cuhFramework.backend.givePlayerData = function(steam_id, name, peer_id, is_admin
 		end,
 
 		get_position = function(self)
-			local pos, success = server.getPlayerPos(self.properties.peer_id)
-			return pos, success
+			return server.getPlayerPos(self.properties.peer_id)
 		end,
 
 		setAdmin = function(self, give)
@@ -2201,13 +2205,6 @@ end
 ---@field id integer The ID of this zone
 ---@field playersInZone table<integer, player> The players in this zone
 
----@class vehicle_customZone
----@field position SWMatrix The position of this zone
----@field size number The size of this zone
----@field callback function The callback that will be activated when a vehicle enters/leaves the zone
----@field id integer The ID of this zone
----@field vehiclesInZone table<integer, player> The vehicles in this zone
-
 ------------------------
 ------Custom Zones (Player)
 ------------------------
@@ -2295,9 +2292,147 @@ end
 
 ----------------------------------------
 ----------------------------------------
+--//Framework - Vehicles\\--
+----------------------------------------
+----------------------------------------
+
+------------------------
+------Intellisense
+------------------------
+---@class loaded_vehicle_data
+---@field voxels number The amount of voxels on this vehicle
+
+---@class vehicleProperties
+---@field vehicle_id integer The ID of this vehicle
+---@field owner player The owner of this vehicle
+---@field spawnPos SWMatrix The position this vehicle was spawned at
+---@field cost number The cost of this vehicle
+---@field addon_spawned boolean Whether or not an addon spawned this vehicle
+---@field name string The name of this vehicle
+---@field loaded boolean Whether or not this vehicle is loaded
+---@field loaded_vehicle_data loaded_vehicle_data The data of this vehicle that can only be retrieved when the vehicle is loaded. The table is empty if the vehicle hasn't loaded yet
+
+---@class vehicle
+---@field properties vehicleProperties The properties of this vehicle
+---@field despawn function<vehicle> Despawn this vehicle
+---@field teleport function<vehicle, SWMatrix> Teleport this vehicle
+---@field explode function<vehicle> Explodes this vehicle and despawns it
+---@field get_position function<vehicle, number?, number?, number?> Get the position of this vehicle. The voxel parameters are optional
+
+------------------------
+------Vehicles
+------------------------
+---@type table<integer, vehicle>
+cuhFramework.vehicles.spawnedVehicles = {}
+
+-- Update spawnedVehicles [Backend]
+cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_id, x, y, z, cost)
+	local data = {
+		properties = {
+			vehicle_id = vehicle_id,
+			owner = cuhFramework.players.getPlayerByPeerId(peer_id),
+			spawnPos = matrix.translation(x, y, z),
+			cost = cost,
+			addon_spawned = peer_id == -1,
+			name = (server.getVehicleName(vehicle_id)),
+
+			loaded = false,
+			loaded_vehicle_data = {}
+		},
+
+		despawn = function(self)
+			cuhFramework.vehicles.spawnedVehicles[self.properties.vehicle_id] = nil
+			server.despawnVehicle(self.properties.vehicle_id, true)
+		end,
+
+		teleport = function(self, pos)
+			return server.setVehiclePos(self.properties.vehicle_id, pos)
+		end,
+
+		explode = function(self)
+			local vehicle_pos, success = self:get_position()
+
+			if success then
+				cuhFramework.references.explode(vehicle_pos, 0.5)
+			end
+
+			self:despawn()
+		end,
+
+		get_position = function(self, voxel_x, voxel_y, voxel_z)
+			return server.getVehiclePos(self.properties.vehicle_id, voxel_x, voxel_y, voxel_z)
+		end
+	}
+
+	cuhFramework.vehicles.spawnedVehicles[vehicle_id] = data
+end
+
+cuhFramework.callbacks.onVehicleSpawn:connect(function(vehicle_id, peer_id, x, y, z, cost)
+	cuhFramework.backend.vehicle_spawn_giveVehicleData(vehicle_id, peer_id, x, y, z, cost)
+end)
+
+cuhFramework.callbacks.onVehicleDespawn(function(vehicle_id, peer_id)
+	local vehicle = cuhFramework.vehicles.getVehicleByVehicleId(vehicle_id)
+	vehicle:despawn()
+end)
+
+---Spawn an addon vehicle
+---@param playlist_id integer The ID of the addon vehicle, this can be found in the playlist.xml file or in the in-game editor
+---@param position SWMatrix The position to spawn this vehicle at
+---@return vehicle_id integer The ID of this vehicle
+---@return boolean success Whether or not spawning this vehicle was successful
+cuhFramework.vehicles.spawnAddonVehicle = function(playlist_id, position)
+	return
+end
+
+---Get a vehicle by its vehicle ID
+---@param vehicle_id integer Vehicle ID of the vehicle you want to get
+cuhFramework.vehicles.getVehicleByVehicleId = function(vehicle_id)
+	return cuhFramework.vehicles.spawnedVehicles[vehicle_id]
+end
+
+---Get a list of vehicles owned by a player
+---@param player player The player to check, use cuhFramework.players.getPlayerByPeerId() to get the player from a peer ID, see documentation
+---@return table<integer, vehicle>|nil vehicles Table of all vehicles owned by this player, or nil if no vehicles
+cuhFramework.vehicles.getAllVehiclesOwnedByPlayer = function(player)
+	local list = {}
+
+	for i, v in pairs(cuhFramework.vehicles.spawnedVehicles) do
+		if v.properties.owner == player then
+			cuhFramework.utilities.table.insert(list, v)
+		end
+	end
+
+	if list[1] then
+		return list
+	else
+		return nil
+	end
+end
+
+---Get vehicle count
+---@return integer vehicleCount Number of vehicles that are spawned and recognised by this addon
+cuhFramework.vehicles.getVehicleCount = function()
+	local count = 0
+
+	for _ in pairs(cuhFramework.vehicles.spawnedVehicles) do -- i dont trust #tableName when the index is a number anymore
+		count = count + 1
+	end
+
+	return count
+end
+
+----------------------------------------
+----------------------------------------
 --//Framework - References\\--
 ----------------------------------------
 ----------------------------------------
+
+------------------------
+------Vehicles
+------------------------
+cuhFramework.references.spawnAddonVehicle = server.spawnAddonVehicle
+cuhFramework.references.despawnVehicle = server.despawnVehicle
 
 ------------------------
 ------UI
@@ -2324,6 +2459,11 @@ cuhFramework.references.removeAllUIWithId = server.removeMapID
 ------Matrix
 ------------------------
 cuhFramework.references.matrix = matrix
+
+------------------------
+------Miscellaneous
+------------------------
+cuhFramework.references.explode = server.spawnExplosion
 
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
