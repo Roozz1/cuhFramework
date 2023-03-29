@@ -2299,9 +2299,6 @@ end
 ------------------------
 ------Intellisense
 ------------------------
----@class loaded_vehicle_data
----@field voxels number The amount of voxels on this vehicle
-
 ---@class vehicleProperties
 ---@field vehicle_id integer The ID of this vehicle
 ---@field owner player The owner of this vehicle
@@ -2310,7 +2307,7 @@ end
 ---@field addon_spawned boolean Whether or not an addon spawned this vehicle
 ---@field name string The name of this vehicle
 ---@field loaded boolean Whether or not this vehicle is loaded
----@field loaded_vehicle_data loaded_vehicle_data The data of this vehicle that can only be retrieved when the vehicle is loaded. The table is empty if the vehicle hasn't loaded yet
+---@field loaded_vehicle_data SWVehicleData The data of this vehicle that can only be retrieved when the vehicle is loaded. The table is empty if the vehicle hasn't loaded yet
 
 ---@class vehicle
 ---@field properties vehicleProperties The properties of this vehicle
@@ -2367,8 +2364,23 @@ cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_i
 	cuhFramework.vehicles.spawnedVehicles[vehicle_id] = data
 end
 
+cuhFramework.backend.vehicle_load_setVehicleData = function(vehicle_id)
+	local vehicle_data = cuhFramework.vehicles.getVehicleByVehicleId(vehicle_id)
+
+	if not vehicle_data then
+		return
+	end
+
+	vehicle_data.properties.loaded = true
+	vehicle_data.properties.loaded_vehicle_data = server.getVehicleData(vehicle_id)
+end
+
 cuhFramework.callbacks.onVehicleSpawn:connect(function(vehicle_id, peer_id, x, y, z, cost)
 	cuhFramework.backend.vehicle_spawn_giveVehicleData(vehicle_id, peer_id, x, y, z, cost)
+end)
+
+cuhFramework.callbacks.onVehicleLoad:connect(function(vehicle_id)
+	cuhFramework.backend.vehicle_load_setVehicleData(vehicle_id)
 end)
 
 cuhFramework.callbacks.onVehicleDespawn(function(vehicle_id, peer_id)
@@ -2379,10 +2391,10 @@ end)
 ---Spawn an addon vehicle
 ---@param playlist_id integer The ID of the addon vehicle, this can be found in the playlist.xml file or in the in-game editor
 ---@param position SWMatrix The position to spawn this vehicle at
----@return vehicle_id integer The ID of this vehicle
+---@return integer vehicle_id The ID of this vehicle
 ---@return boolean success Whether or not spawning this vehicle was successful
 cuhFramework.vehicles.spawnAddonVehicle = function(playlist_id, position)
-	return
+	return server.spawnAddonVehicle(position, (server.getAddonIndex()), playlist_id)
 end
 
 ---Get a vehicle by its vehicle ID
