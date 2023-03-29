@@ -2206,6 +2206,13 @@ end
 ---@field id integer The ID of this zone
 ---@field playersInZone table<integer, player> The players in this zone
 
+---@class vehicle_customZone
+---@field position SWMatrix The position of this zone
+---@field size number The size of this zone
+---@field callback function The callback that will be activated when a vehicle enters/leaves the zone
+---@field id integer The ID of this zone
+---@field vehiclesInZone table<integer, vehicle> The vehicles in this zone
+
 ------------------------
 ------Custom Zones (Player)
 ------------------------
@@ -2233,6 +2240,7 @@ cuhFramework.customZones.createPlayerZone = function(position, size, callback)
 			local zone = cuhFramework.customZones.activePlayerZones[id]
 			for i, player in pairs(cuhFramework.players.connectedPlayers) do
 				local distance = cuhFramework.references.matrix.distance(player:get_position(), zone.position)
+
 				if distance <= zone.size then
 					if not zone.playersInZone[player.properties.peer_id] then
 						zone.playersInZone[player.properties.peer_id] = player
@@ -2287,8 +2295,102 @@ end
 ---@return nil
 cuhFramework.customZones.removePlayerZone = function(id)
 	local zone = cuhFramework.customZones.activePlayerZones[id]
-	zone.backend_loop:remove()
+
+	if zone then
+		zone.backend_loop:remove()
+	end
+
 	cuhFramework.customZones.activePlayerZones[id] = nil
+end
+
+------------------------
+------Custom Zones (Vehicle)
+------------------------
+---@type table<integer, vehicle_customZone>
+cuhFramework.customZones.activeVehicleZones = {}
+
+---Create a zone for vehicles
+---@param position SWMatrix The position the zone should be at
+---@param size number The size of the zone in meters
+---@param callback function The function that should be called when a vehicle enters the zone. A vehicle will be sent through the callback if a vehicle enters/leaves the zone, along with a boolean. true = Vehicle entered, false = Vehicle left
+cuhFramework.customZones.createVehicleZone = function(position, size, callback)
+	if not callback then
+		return false
+	end
+
+	local id = #cuhFramework.customZones.activeVehicleZones + 1
+	cuhFramework.customZones.activeVehicleZones[id] = {
+		position = position,
+		size = size,
+		callback = callback,
+		id = id,
+		vehiclesInZone = {},
+
+		backend_loop = cuhFramework.utilities.loop.create(0.02, function()
+			local zone = cuhFramework.customZones.activeVehicleZones[id]
+			for i, vehicle in pairs(cuhFramework.vehicles.spawnedVehicles) do
+				local distance = cuhFramework.references.matrix.distance(vehicle:get_position(), zone.position)
+
+				if distance <= zone.size then
+					if not zone.vehiclesInZone[vehicle.properties.vehicle_id] then
+						zone.vehiclesInZone[vehicle.properties.vehicle_id] = vehicle
+						zone.callback(vehicle, true)
+					end
+				else
+					if zone.vehiclesInZone[vehicle.properties.vehicle_id] then
+						zone.vehiclesInZone[vehicle.properties.vehicle_id] = nil
+						zone.callback(vehicle, false)
+					end
+				end
+			end
+		end)
+	}
+
+	return {
+		---@type vehicle_customZone
+		properties = cuhFramework.customZones.activeVehicleZones[id],
+
+		---Remove this zone
+		---@return nil
+		remove = function(self)
+			cuhFramework.customZones.removeVehicleZone(self.properties.id)
+		end,
+
+		---Edit this zone
+		---@param new_position SWMatrix|nil What the new position should be, set to nil if you don't want to change
+		---@param new_size number|nil What the new size should be, set to nil if you don't want to change
+		---@param new_callback function|nil What the new callback should be, set to nil if you don't want to change
+		---@return nil
+		edit = function(self, new_position, new_size, new_callback)
+			self.properties.position = new_position or self.properties.position
+			self.properties.size = new_size or self.properties.size
+			self.properties.callback = new_callback or self.properties.callback
+		end
+	}
+end
+
+---Whether or not a position is within a vehicle zone
+---@param position SWMatrix The position to check
+---@return vehicle_customZone|nil zone The vehicle zone the position is in, or nil if no vehicle zone was found
+cuhFramework.customZones.isPositionInVehicleZone = function(position)
+	for i, v in pairs(cuhFramework.customZones.activeVehicleZones) do
+		if cuhFramework.references.matrix.distance(position, v.position) <= v.size then
+			return v
+		end
+	end
+end
+
+---Remove a vehicle zone
+---@param id integer The ID of the vehicle zone
+---@return nil
+cuhFramework.customZones.removeVehicleZone = function(id)
+	local zone = cuhFramework.customZones.activeVehicleZones[id]
+
+	if zone then
+		zone.backend_loop:remove()
+	end
+
+	cuhFramework.customZones.activeVehicleZones[id] = nil
 end
 
 ----------------------------------------
