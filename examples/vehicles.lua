@@ -20,6 +20,9 @@ cuhFramework.callbacks.onVehicleSpawn:connect(function(vehicle_id)
 
     -- Set the tooltip of the vehicle
     vehicle:set_tooltip("My cool vehicle!")
+
+    -- Set this vehicle to be invulnerable to damage
+    vehicle:set_invulnerability(true)
 end)
 
 -- Connect a function to the onVehicleLoad callback
