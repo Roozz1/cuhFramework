@@ -33,7 +33,6 @@
 --//Framework\\--
 ----------------------------------------
 ----------------------------------------
-
 cuhFramework = {
 	players = {},
 	vehicles = {},
@@ -79,7 +78,6 @@ cuhFramework = {
 --//Backend - Save Data\\--
 ----------------------------------------
 ----------------------------------------
-
 g_savedata = {}
 
 ----------------------------------------
@@ -87,7 +85,6 @@ g_savedata = {}
 --//Backend - Updates [DO NOT USE]\\--
 ----------------------------------------
 ----------------------------------------
-
 cuhFramework.backend.updates:create_exception(cuhFramework.backend.updates.create_exception)
 cuhFramework.backend.updates:create_exception(cuhFramework.backend.updates.insert)
 
@@ -96,7 +93,6 @@ cuhFramework.backend.updates:create_exception(cuhFramework.backend.updates.inser
 --//Framework - Callbacks\\--
 ----------------------------------------
 ----------------------------------------
-
 cuhFramework.callbacks.onTick = {
 	connections = {},
 	---Connect a callback to onTick
