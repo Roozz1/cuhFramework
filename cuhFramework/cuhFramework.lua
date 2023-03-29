@@ -2154,7 +2154,7 @@ cuhFramework.ui.screen.create = function(id, text, x, y, player)
 		---Remove this UI
 		---@return nil
 		remove = function(self)
-			return cuhFramework.ui.screen.remove(self.properties.index)
+			return cuhFramework.ui.screen.remove(self.properties.id)
 		end,
 
 		---Edit this UI
