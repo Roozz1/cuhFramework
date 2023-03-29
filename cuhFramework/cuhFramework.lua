@@ -2489,6 +2489,8 @@ end
 ---@field explode function<vehicle> Explodes this vehicle and despawns it
 ---@field get_position function<vehicle, number?, number?, number?> Get the position of this vehicle. The voxel parameters are optional
 ---@field set_tooltip function<vehicle, string> Sets the tooltip of this vehicle
+---@field set_invulnerability function<vehicle, boolean> Sets the invulnerability of this vehicle to whatever you specify (true = this vehicle can receive no damage, false = this vehicle can receive damage)
+---@field repair function<vehicle> Repairs the vehicle. Clears all damage and refills inventories by completely respawning the vehicle at its current position
 
 ------------------------
 ------Vehicles
@@ -2536,6 +2538,14 @@ cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_i
 
 		set_tooltip = function(self, text)
 			return server.setVehicleTooltip(self.properties.vehicle_id, text)
+		end,
+
+		set_invulnerability = function(self, state)
+			return server.setVehicleInvulnerable(self.properties.vehicle, state)
+		end,
+
+		repair = function(self)
+			return server.resetVehicleState(self.properties.vehicle_id)
 		end
 	}
 
@@ -2546,6 +2556,10 @@ cuhFramework.backend.vehicle_load_setVehicleData = function(vehicle_id)
 	local vehicle_data = cuhFramework.vehicles.getVehicleByVehicleId(vehicle_id)
 
 	if not vehicle_data then
+		return
+	end
+
+	if vehicle_data.properties.loaded then
 		return
 	end
 
@@ -2564,7 +2578,7 @@ end)
 cuhFramework.callbacks.onVehicleDespawn:connect(function(vehicle_id, peer_id)
 	local vehicle = cuhFramework.vehicles.getVehicleByVehicleId(vehicle_id)
 
-	if vehicle then -- checking if the vehicle is recognised by the framework (vehicle may have spawned before a ?reload_scripts or something)
+	if vehicle then -- checking if the vehicle is recognised by this addon (vehicle may have spawned before a ?reload_scripts or something)
 		vehicle:despawn()
 	end
 end)
