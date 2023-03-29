@@ -17,6 +17,9 @@ cuhFramework.callbacks.onVehicleSpawn:connect(function(vehicle_id)
         "\nVehicle ID: ", vehicle.properties.vehicle_id,
         "\nLoaded: ", tostring(vehicle.properties.loaded)
     })
+
+    -- Set the tooltip of the vehicle
+    vehicle:set_tooltip("My cool vehicle!")
 end)
 
 -- Connect a function to the onVehicleLoad callback
@@ -33,4 +36,9 @@ cuhFramework.callbacks.onVehicleLoad:connect(function(vehicle_id)
             "\nLoaded: ", tostring(vehicle.properties.loaded)
         })
     end
+
+    -- Explode the vehicle after 3 seconds
+    cuhFramework.utilities.delay.create(3, function()
+        vehicle:explode()
+    end)
 end)
