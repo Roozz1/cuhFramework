@@ -2383,7 +2383,7 @@ cuhFramework.callbacks.onVehicleLoad:connect(function(vehicle_id)
 	cuhFramework.backend.vehicle_load_setVehicleData(vehicle_id)
 end)
 
-cuhFramework.callbacks.onVehicleDespawn(function(vehicle_id, peer_id)
+cuhFramework.callbacks.onVehicleDespawn:connect(function(vehicle_id, peer_id)
 	local vehicle = cuhFramework.vehicles.getVehicleByVehicleId(vehicle_id)
 	vehicle:despawn()
 end)
