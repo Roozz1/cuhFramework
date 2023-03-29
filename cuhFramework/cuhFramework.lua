@@ -44,6 +44,7 @@ cuhFramework = {
 	tps = {},
 	customZones = {},
 	ui = {},
+	disasters = {},
 
 	utilities = {},
 	callbacks = {},
@@ -2288,6 +2289,76 @@ cuhFramework.customZones.removePlayerZone = function(id)
 	local zone = cuhFramework.customZones.activePlayerZones[id]
 	zone.backend_loop:remove()
 	cuhFramework.customZones.activePlayerZones[id] = nil
+end
+
+----------------------------------------
+----------------------------------------
+--//Framework - Disasters\\--
+----------------------------------------
+----------------------------------------
+
+---Spawn a tsunami
+---@param position SWMatrix The matrix position the tsunami should spawn at
+---@param magnitude number The magnitude of the tsunami (0 - 1)
+cuhFramework.disasters.spawnTsunami = function(position, magnitude)
+	server.spawnTsunami(position, magnitude)
+	return {
+		---Cancel this tsunami
+		cancel = function(self)
+			server.cancelGerstner()
+		end
+	}
+end
+
+---Spawn a whirlpool
+---@param position SWMatrix The matrix position the whirlpool should spawn at
+---@param magnitude number The magnitude of the whirlpool (0 - 1)
+cuhFramework.disasters.spawnWhirlpool = function(position, magnitude)
+	server.spawnWhirlpool(position, magnitude)
+	return {
+		---Cancel this whirlpool
+		cancel = function(self)
+			server.cancelGerstner()
+		end
+	}
+end
+
+---Spawn a volcano
+---@param position SWMatrix The matrix position the volcano should spawn at
+---@param magnitude number The magnitude of the volcano (0 - 1)
+---@return boolean success Whether or not the volcano spawned successfully
+cuhFramework.disasters.spawnVolcano = function(position, magnitude)
+	return server.spawnVolcano(position, magnitude)
+end
+
+---Get volcano data
+---@return table<number, SWVolcano> volcano_data Table containing all volcanoes
+cuhFramework.disasters.getVolcanoes = function(position, magnitude)
+	return server.getVolcanos()
+end
+
+---Spawn a meteor
+---@param position SWMatrix The matrix position the meteor should spawn at
+---@param magnitude number The magnitude of the meteor (0 - 1)
+---@return boolean success Whether or not the meteor spawned successfully
+cuhFramework.disasters.spawnMeteor = function(position, magnitude)
+	return server.spawnMeteor(position, magnitude, false)
+end
+
+---Spawn a meteor shower
+---@param position SWMatrix The matrix position the meteor shower should spawn at
+---@param magnitude number The magnitude of the meteor shower (0 - 1)
+---@return boolean success Whether or not the meteor shower spawned successfully
+cuhFramework.disasters.spawnMeteorShower = function(position, magnitude)
+	return server.spawnMeteorShower(position, magnitude, false)
+end
+
+---Spawn a tornado
+---@param position SWMatrix The matrix position the tornado should spawn at
+---@param magnitude number The magnitude of the tornado (0 - 1)
+---@return boolean success Whether or not the tornado spawned successfully
+cuhFramework.disasters.spawnTornado = function(position, magnitude)
+	return server.spawnTornado(position, magnitude)
 end
 
 ----------------------------------------
