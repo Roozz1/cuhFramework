@@ -2315,6 +2315,7 @@ end
 ---@field teleport function<vehicle, SWMatrix> Teleport this vehicle
 ---@field explode function<vehicle> Explodes this vehicle and despawns it
 ---@field get_position function<vehicle, number?, number?, number?> Get the position of this vehicle. The voxel parameters are optional
+---@field set_tooltip function<vehicle, string> Sets the tooltip of this vehicle
 
 ------------------------
 ------Vehicles
@@ -2358,6 +2359,10 @@ cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_i
 
 		get_position = function(self, voxel_x, voxel_y, voxel_z)
 			return server.getVehiclePos(self.properties.vehicle_id, voxel_x, voxel_y, voxel_z)
+		end,
+
+		set_tooltip = function(self, text)
+			return server.setVehicleTooltip(self.properties.vehicle_id, text)
 		end
 	}
 
