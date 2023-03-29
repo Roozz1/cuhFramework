@@ -1639,6 +1639,7 @@ end
 ---@field giveItem function<player, SWSlotNumberEnum, SWEquipmentTypeEnum, integer, integer, float, boolean|nil> Gives this player an item
 ---@field removeItem function<player, SWSlotNumberEnum> Removes an item in the specified slot from this player
 ---@field hasItem function<player, SWSlotNumberEnum> Whether or not this player has an item in a slot
+---@field damage function<player, number> Apply damage to a player, pass a negative number to heal
 
 ------------------------
 ------Players
@@ -1712,6 +1713,17 @@ cuhFramework.backend.givePlayerData = function(steam_id, name, peer_id, is_admin
 			local char_id = server.getPlayerCharacterID(self.properties.peer_id)
 			-- server.killCharacter(char_id) -- tends to call onPlayerDie twice
 			server.setCharacterData(char_id, 0, false, false)
+		end,
+
+		damage = function(self, amount)
+			local char_id = server.getPlayerCharacterID(self.properties.peer_id)
+			local data = server.getCharacterData(char_id)
+
+			if not data then
+				return
+			end
+
+			server.setCharacterData(char_id, data.hp - amount, data.interactible, data.ai)
 		end
 	}
 
