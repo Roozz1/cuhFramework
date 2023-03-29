@@ -1760,6 +1760,16 @@ cuhFramework.players.getPlayerBySteamId = function(steam_id)
 	end
 end
 
+---Get a player by an object ID
+---@param object_id integer The object ID of the player
+cuhFramework.players.getPlayerByObjectId = function(object_id)
+	for i, v in pairs(cuhFramework.players.connectedPlayers) do
+		if (server.getPlayerCharacterID(v.properties.peer_id)) == object_id then
+			return v
+		end
+	end
+end
+
 ---Get a player by their Steam ID
 ---@param name string Name of the player
 ---@param caps_sensitive boolean Whether or not the search should be caps sensitive
