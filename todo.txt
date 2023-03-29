@@ -1,8 +1,4 @@
 - savedata functions
-- vehicle zones
-- object zones
-- character zones
-- creature zones
 
 - getRandomValue() in utilities.table (done)
 - tps stuff (done)
@@ -18,3 +14,4 @@
 - vehicle functions (done)
 - more references (done)
 - disaster functions (done)
+- vehicle zones (done)
