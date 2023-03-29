@@ -2385,7 +2385,10 @@ end)
 
 cuhFramework.callbacks.onVehicleDespawn:connect(function(vehicle_id, peer_id)
 	local vehicle = cuhFramework.vehicles.getVehicleByVehicleId(vehicle_id)
-	vehicle:despawn()
+
+	if vehicle then -- checking if the vehicle is recognised by the framework (vehicle may have spawned before a ?reload_scripts or something)
+		vehicle:despawn()
+	end
 end)
 
 ---Spawn an addon vehicle
