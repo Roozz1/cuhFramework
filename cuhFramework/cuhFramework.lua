@@ -1269,9 +1269,14 @@ end
 ---Scatter position, think utilities.matrix.offsetPosition but by a random amount
 ---@param position SWMatrix The position to scatter
 ---@param amount integer The amount to scatter the position by (if amount is 2, it becomes math.random(-2, 2) in this function)
+---@param shouldApplyToY boolean|nil Whether or not to scatter the Y position too (default is false)
 ---@return SWMatrix newPosition The new position
-cuhFramework.utilities.matrix.scatterPosition = function(position, amount)
-	return cuhFramework.utilities.matrix.offsetPosition(position, math.random(-amount, amount), math.random(-amount, amount), math.random(-amount, amount))
+cuhFramework.utilities.matrix.scatterPosition = function(position, amount, shouldApplyToY)
+	if not shouldApplyToY then
+		return cuhFramework.utilities.matrix.offsetPosition(position, math.random(-amount, amount), 0, math.random(-amount, amount))
+	else
+		return cuhFramework.utilities.matrix.offsetPosition(position, math.random(-amount, amount), math.random(-amount, amount), math.random(-amount, amount))
+	end
 end
 
 ------------------------
