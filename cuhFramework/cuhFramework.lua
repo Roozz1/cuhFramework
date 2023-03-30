@@ -1878,6 +1878,12 @@ cuhFramework.objects.spawnObject = function(matrix, object_type)
 		get_position = function(self)
 			return server.getObjectPos(self.properties.object_id)
 		end,
+
+		---Get raw Stormworks data from this object
+		---@return SWObjectData|nil object_data The data of this object, or nil if failed to get data
+		get_data = function(self)
+			return server.getObjectData(self.properties.object_id)
+		end
 	}
 end
 
@@ -1977,7 +1983,7 @@ cuhFramework.creatures.spawnCreature = function(position, creature_type, size_mu
 		---@param amount number The about of damage to apply to this creature. A negative number will heal this creature.
 		---@return boolean success Whether or not applying damage to this creature was successful
 		damage = function(self, amount)
-			local data = server.getCharacterData(self.properties.object_id)
+			local data = self:get_data()
 
 			if not data then
 				return false
@@ -1985,6 +1991,12 @@ cuhFramework.creatures.spawnCreature = function(position, creature_type, size_mu
 
 			server.setCharacterData(self.properties.object_id, data.hp - amount, data.interactible, data.ai)
 			return true
+		end,
+
+		---Get raw Stormworks data from this creature
+		---@return SWObjectData|nil creature_data The data of this creature, or nil if failed to get data
+		get_data = function(self)
+			return server.getObjectData(self.properties.object_id)
 		end
 	}
 end
@@ -2074,7 +2086,7 @@ cuhFramework.characters.spawnCharacter = function(position, outfit_id)
 		---@param amount number The about of damage to apply to this character. A negative number will heal this character.
 		---@return boolean success Whether or not applying damage to this character was successful
 		damage = function(self, amount)
-			local data = server.getCharacterData(self.properties.object_id)
+			local data = self:get_data()
 
 			if not data then
 				return false
@@ -2082,6 +2094,12 @@ cuhFramework.characters.spawnCharacter = function(position, outfit_id)
 
 			server.setCharacterData(self.properties.object_id, data.hp - amount, data.interactible, data.ai)
 			return true
+		end,
+
+		---Get raw Stormworks data from this character
+		---@return SWObjectData|nil character_data The data of this character, or nil if failed to get data
+		get_data = function(self)
+			return server.getObjectData(self.properties.object_id)
 		end
 	}
 end
