@@ -1,12 +1,12 @@
 - savedata functions
-- ui notification functioins
 - cod zombies cuhframework showcase addon, upload to workshop too
-- cooldown functions
-- scatter pos function
-- table.utilities get table count function (in case #tbl doesnt work)
-- load all ui when a player joins, but only if the target is nil/the player that joins
-- make objects, creatues, and character functions apart of the table instead of the return thing (like players and vehicles)
+- cooldown functions (done)
 
+- scatter pos function (done)
+- table.utilities get table count function (in case #tbl doesnt work) (done)
+- ui notification functioins (done)
+- load all ui when a player joins, but only if the target is nil/the player that joins (done)
+- make objects, creatues, and character functions apart of the table instead of the return thing (like players and vehicles) (done)
 - http get reference (done)
 - getRandomValue() in utilities.table (done)
 - tps stuff (done)

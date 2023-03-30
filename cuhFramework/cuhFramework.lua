@@ -56,14 +56,12 @@ cuhFramework = {
 		updates = {
 			---Insert update function. Don't use this
 			---@param func function Function that should be called every tick
-			---@return nil
 			insert = function(self, func)
 				table.insert(self, func)
 			end,
 
 			---Create an exception. The exception will not be called by onTick. Don't use this
 			---@param exception function The function to exclude
-			---@return nil
 			create_exception = function(self, exception)
 				table.insert(self.exceptions, exception)
 			end,
@@ -1107,7 +1105,6 @@ end
 ---Insert a value into a table, alias to table.insert
 ---@param tbl table Table to insert the value in
 ---@param value any Value to insert
----@return nil
 cuhFramework.utilities.table.insert = function(tbl, value)
 	table.insert(tbl, value)
 end
@@ -1190,6 +1187,19 @@ cuhFramework.utilities.table.sumOfTable = function(tbl)
 	return current
 end
 
+---Get the value count in a table (recommended to do #tbl instead of using this)
+---@param tbl table Table to check
+---@return integer valueCount The amount of values in this table
+cuhFramework.utilities.table.valueCount = function(tbl)
+	local count = 0
+
+	for i, v in pairs(tbl) do
+		count = count + 1
+	end
+
+	return count
+end
+
 ------------------------
 ------Number
 ------------------------
@@ -1254,6 +1264,14 @@ cuhFramework.utilities.matrix = {}
 ---@return SWMatrix newPosition The offset position
 cuhFramework.utilities.matrix.offsetPosition = function(position, x, y, z)
 	return cuhFramework.references.matrix.translation(position[13] + (x or 0), position[14] +(y or 0), position[15] + (z or 0))
+end
+
+---Scatter position, think utilities.matrix.offsetPosition but by a random amount
+---@param position SWMatrix The position to scatter
+---@param amount integer The amount to scatter the position by (if amount is 2, it becomes math.random(-2, 2) in this function)
+---@return SWMatrix newPosition The new position
+cuhFramework.utilities.matrix.scatterPosition = function(position, amount)
+	return cuhFramework.utilities.matrix.offsetPosition(position, math.random(-amount, amount), math.random(-amount, amount), math.random(-amount, amount))
 end
 
 ------------------------
@@ -1519,7 +1537,6 @@ end
 
 ---Remove a command by its ID
 ---@param command_id integer The ID of the command. To get the ID of a command: cuhFramework.commands.create("my_command", {"m_c", "mc"}, function() end, false).properties.id or use cuhFramework.commands.getCommandFromName()
----@return nil
 cuhFramework.commands.remove = function(command_id)
 	cuhFramework.commands.registeredCommands = nil
 end
@@ -1580,7 +1597,6 @@ end)
 ---@param author string The orange text in chat, if author was "Bob", in chat, it would look like: "Bob			(message here)"
 ---@param message string|table What to send in chat (can be a string or a table)
 ---@param player player|nil The player to send the message to. If this is nil, the message will be sent to everyone
----@return nil
 cuhFramework.chat.send_message = function(author, message, player)
 	local msg = tostring(message)
 
@@ -1597,7 +1613,6 @@ end
 
 ---Clears the chat by sending 11 blank messages
 ---@param player player|nil The player to clear chat for. If this is nil, chat will be cleared for everyone
----@return nil
 cuhFramework.chat.clear = function(player)
 	for _ = 1, 11 do
 		cuhFramework.chat.send_message("", " ", player)
@@ -1724,8 +1739,15 @@ cuhFramework.backend.givePlayerData = function(steam_id, name, peer_id, is_admin
 	cuhFramework.players.connectedPlayers[peer_id] = data
 end
 
-cuhFramework.callbacks.onPlayerJoin:connect(function(...)
-	cuhFramework.backend.givePlayerData(...)
+cuhFramework.callbacks.onPlayerJoin:connect(function(steam_id, name, peer_id, is_admin, is_auth)
+	cuhFramework.backend.givePlayerData(steam_id, name, peer_id, is_admin, is_auth)
+
+	-- and show running ui (extremely useful)
+	for i, v in pairs(cuhFramework.ui.screen.activeUI) do
+		if not v.player then
+			server.setPopupScreen(peer_id, v.id, "", v.visible, v.text, v.x, v.y)
+		end
+	end
 end)
 
 for i, v in pairs(server.getPlayers()) do
@@ -1733,7 +1755,7 @@ for i, v in pairs(server.getPlayers()) do
 end
 
 cuhFramework.callbacks.onPlayerLeave:connect(function(steam_id, name, peer_id, is_admin, is_auth)
-	cuhFramework.utilities.delay.create(0.05, function() -- wait some time before removing data, that way addon creators can get player data when they leave
+	cuhFramework.utilities.delay.create(0.05, function() -- wait some time before removing data, that way addon developers can get the player data of someone that has left
 		cuhFramework.players.connectedPlayers[peer_id] = nil
 	end)
 end)
@@ -1836,68 +1858,85 @@ end
 --//Framework - Objects\\--
 ----------------------------------------
 ----------------------------------------
----@type table<integer, SWMatrix>
+
+------------------------
+------Intellisense
+------------------------
+---@class object_properties
+---@field object_id integer The object ID of this object
+---@field position SWMatrix The position this object was spawned at
+---@field object_type SWObjectTypeEnum The type of object
+
+---@class object
+---@field properties object_properties The properties of this creature
+---@field despawn function<object> Despawn this object
+---@field teleport function<object, SWMatrix> Teleport this object
+---@field get_position function<object> Get the position of this object
+---@field get_data function<object> Returns the raw data of this object provided by Stormworks
+
+------------------------
+------Creatures
+------------------------
+---@type table<integer, object>
 cuhFramework.objects.spawnedObjects = {}
 
----Spawn an object
----@param matrix SWMatrix The position to spawn the object at
----@param object_type SWObjectTypeEnum The object to spawn
-cuhFramework.objects.spawnObject = function(matrix, object_type)
-	local obj_id, success = server.spawnObject(matrix, object_type)
+---Spawn a object
+---@param position SWMatrix The position to spawn this object at
+---@param object_type SWObjectTypeEnum The type of object to spawn
+---@return object|nil object The object, or nil if failed to spawn
+cuhFramework.objects.spawnObject = function(position, object_type)
+	local object_id, success = server.spawnObject(position, object_type)
 
 	if not success then
 		return
 	end
 
-	cuhFramework.objects.spawnedObjects[obj_id] = matrix
-
-	return {
+	cuhFramework.objects.spawnedObjects[object_id] = {
 		properties = {
-			object_id = obj_id,
-			success = success
+			object_id = object_id,
+			spawn_position = position,
+			object_type = object_type
 		},
 
-		---Despawn this object
-		---@return boolean success Whether or not despawning this object was successful
 		despawn = function(self)
 			return cuhFramework.objects.despawnObject(self.properties.object_id)
 		end,
 
-		---Teleport this object
-		---@param target_position SWMatrix The position to teleport this object to
-		---@return boolean success Whether or not the teleportation was successful
-		teleport = function(self, target_position)
-			return server.setObjectPos(self.properties.object_id, target_position)
+		teleport = function(self, position)
+			return server.setObjectPos(self.properties.object_id, position)
 		end,
 
-		---Get the position of this object
-		---@return SWMatrix objectPosition The position of this object
-		---@return boolean success Whether or not getting the position of this object was successful
 		get_position = function(self)
 			return server.getObjectPos(self.properties.object_id)
 		end,
 
-		---Get raw Stormworks data from this object
-		---@return SWObjectData|nil object_data The data of this object, or nil if failed to get data
 		get_data = function(self)
 			return server.getObjectData(self.properties.object_id)
 		end
 	}
+
+	return cuhFramework.objects.spawnedObjects[object_id]
+end
+
+---Get object by object ID
+---@param object_id integer The object ID of the object
+---@return object|nil object The object, or nil if no object found
+cuhFramework.objects.getObjectByObjectId = function(object_id)
+	return cuhFramework.objects.spawnedObjects[object_id]
 end
 
 ---Despawn an object
----@param object_id integer The object ID of the object
+---@param object_id integer The object ID of the object you want to despawn
 ---@return boolean success Whether or not despawning this object was successful
-cuhFramework.objects.despawnObject = function(object_id)
-	cuhFramework.objects.spawnedObjects[object_id] = nil
+cuhFramework.object.despawnObject = function(object_id)
+	cuhFramework.creatures.spawnedCreatures[object_id] = nil
 	return server.despawnObject(object_id, true)
 end
 
 ---Despawn all addon-recognised objects
----@return nil
 cuhFramework.objects.despawnAllObjects = function()
 	for i, v in pairs(cuhFramework.objects.spawnedObjects) do
-		cuhFramework.objects.despawnObject(i)
+		cuhFramework.objects.despawnObject(v.properties.object_id)
 	end
 end
 
@@ -1910,76 +1949,64 @@ end
 ------------------------
 ------Intellisense
 ------------------------
----@class creature_data
+---@class creature_properties
 ---@field object_id integer The object ID of this creature
----@field spawn_position SWMatrix The position this creature was spawned at
----@field size_multiplier number The size multiplier of this creature
+---@field position SWMatrix The position this creature was spawned at
 ---@field creature_type SWCreatureTypeEnum The creature type of this creature
+---@field size_multiplier number The size multiplier of this creature
+
+---@class creature
+---@field properties creature_properties The properties of this creature
+---@field despawn function<creature> Despawn this creature
+---@field teleport function<creature, SWMatrix> Teleport this creature
+---@field kill function<creature> Kill this creature
+---@field get_position function<creature> Get the position of this creature
+---@field damage function<creature, number> Damage this creature, negative number = heal
+---@field set_move_target function<creature, SWMatrix> Make the creature walk to this position
+---@field get_data function<creature> Returns the raw data of this creature provided by Stormworks
 
 ------------------------
 ------Creatures
 ------------------------
----@type table<integer, creature_data>
+---@type table<integer, creature>
 cuhFramework.creatures.spawnedCreatures = {}
 
----Spawn a creature (requires Industrial Frontier DLC)
+---Spawn a creature
 ---@param position SWMatrix The position to spawn this creature at
----@param creature_type SWCreatureTypeEnum The creature to spawn
----@param size_multiplier number 1 = default size, lower = smaller, higher = larger
+---@param creature_type SWCreatureTypeEnum The type of creature
+---@param size_multiplier number The size multiplier of this creature
+---@return creature|nil creature The creature, or nil if failed to spawn
 cuhFramework.creatures.spawnCreature = function(position, creature_type, size_multiplier)
 	local object_id, success = server.spawnCreature(position, creature_type, size_multiplier)
 
 	if not success then
-		return false
+		return
 	end
 
-	local id = #cuhFramework.creatures.spawnedCreatures + 1
-	cuhFramework.creatures.spawnedCreatures[id] = {
-		object_id = object_id,
-		spawn_position = position,
-		size_multiplier = size_multiplier,
-		creature_type = creature_type
-	}
+	cuhFramework.creatures.spawnedCreatures[object_id] = {
+		properties = {
+			object_id = object_id,
+			spawn_position = position,
+			creature_type = creature_type,
+			size_multiplier = size_multiplier
+		},
 
-	return {
-		properties = cuhFramework.creatures.spawnedCreatures[id],
-
-		---Despawn this creature
-		---@return boolean success Whether or not despawning this creature was successful
 		despawn = function(self)
 			return cuhFramework.creatures.despawnCreature(self.properties.object_id)
 		end,
 
-		---Teleport this creature
-		---@param position SWMatrix The position to teleport this creature to
-		---@return boolean success Whether or not despawning this creature was successful
 		teleport = function(self, position)
 			return server.setObjectPos(self.properties.object_id, position)
 		end,
 
-		---Kill this creature
-		---@return nil
 		kill = function(self)
 			server.killCharacter(self.properties.object_id)
 		end,
 
-		---Get the position of this creature
-		---@return SWMatrix position The position of this creature
-		---@return boolean success Whether or not retrieving the position of this creature was successful
 		get_position = function(self)
 			return server.getObjectPos(self.properties.object_id)
 		end,
 
-		---Set the move target of this creature
-		---@param position SWMatrix The position for this creature to move to
-		---@return boolean success Whether or not setting the move target of this creature was successful
-		setMoveTarget = function(self, position)
-			return server.setCreatureMoveTarget(self.properties.object_id, position)
-		end,
-
-		---Apply damage to this creature
-		---@param amount number The about of damage to apply to this creature. A negative number will heal this creature.
-		---@return boolean success Whether or not applying damage to this creature was successful
 		damage = function(self, amount)
 			local data = self:get_data()
 
@@ -1991,12 +2018,23 @@ cuhFramework.creatures.spawnCreature = function(position, creature_type, size_mu
 			return true
 		end,
 
-		---Get raw Stormworks data from this creature
-		---@return SWObjectData|nil creature_data The data of this creature, or nil if failed to get data
+		set_move_target = function(self, position)
+			return server.setCreatureMoveTarget(self.properties.object_id, position)
+		end,
+
 		get_data = function(self)
 			return server.getObjectData(self.properties.object_id)
 		end
 	}
+
+	return cuhFramework.creatures.spawnedCreatures[object_id]
+end
+
+---Get creature by object ID
+---@param object_id integer The object ID of the creature
+---@return creature|nil creature The creature, or nil if no creature found
+cuhFramework.creatures.getCreatureByObjectId = function(object_id)
+	return cuhFramework.creatures.spawnedCreatures[object_id]
 end
 
 ---Despawn a creature
@@ -2016,73 +2054,60 @@ end
 ------------------------
 ------Intellisense
 ------------------------
----@class character_data
+---@class character_properties
 ---@field object_id integer The object ID of this character
 ---@field position SWMatrix The position this character was spawned at
 ---@field outfit_id SWOutfitTypeEnum The character type of this character
 
+---@class character
+---@field properties character_properties The properties of this character
+---@field despawn function<character> Despawn this character
+---@field teleport function<character, SWMatrix> Teleport this character
+---@field kill function<character> Kill this character
+---@field get_position function<character> Get the position of this character
+---@field damage function<character, number> Damage this character, negative number = heal
+---@field get_data function<character> Returns the raw data of this character provided by Stormworks
+
 ------------------------
 ------Characters
 ------------------------
----@type table<integer, character_data>
+---@type table<integer, character>
 cuhFramework.characters.spawnedCharacters = {}
 
 ---Spawn a character
 ---@param position SWMatrix The position to spawn this character at
 ---@param outfit_id SWOutfitTypeEnum The character outfit the character should spawn with
+---@return character|nil character The character, or nil if failed to spawn
 cuhFramework.characters.spawnCharacter = function(position, outfit_id)
 	local object_id, success = server.spawnCharacter(position, outfit_id)
 
 	if not success then
-		return false
+		return nil
 	end
 
-	local id = #cuhFramework.characters.spawnedCharacters + 1
-	cuhFramework.characters.spawnedCharacters[id] = {
-		object_id = object_id,
-		spawn_position = position,
-		outfit_id = outfit_id
-	}
+	cuhFramework.characters.spawnedCharacters[object_id] = {
+		properties = {
+			object_id = object_id,
+			spawn_position = position,
+			outfit_id = outfit_id
+		},
 
-	return {
-		properties = cuhFramework.characters.spawnedCharacters[id],
-
-		---Despawn this character
-		---@return boolean success Whether or not despawning this character was successful
 		despawn = function(self)
 			return cuhFramework.characters.despawnCharacter(self.properties.object_id)
 		end,
 
-		---Teleport this character
-		---@param position SWMatrix The position to teleport this character to
-		---@return boolean success Whether or not despawning this character was successful
 		teleport = function(self, position)
 			return server.setObjectPos(self.properties.object_id, position)
 		end,
 
-		---Kill this character
-		---@return nil
 		kill = function(self)
 			server.killCharacter(self.properties.object_id)
 		end,
 
-		---Get the position of this character
-		---@return SWMatrix position The position of this character
-		---@return boolean success Whether or not retrieving the position of this character was successful
 		get_position = function(self)
 			return server.getObjectPos(self.properties.object_id)
 		end,
 
-		---Set the move target of this character
-		---@param position SWMatrix The position for this character to move to
-		---@return boolean success Whether or not setting the move target of this character was successful
-		setMoveTarget = function(self, position)
-			return server.setCreatureMoveTarget(self.properties.object_id, position)
-		end,
-
-		---Apply damage to this character
-		---@param amount number The about of damage to apply to this character. A negative number will heal this character.
-		---@return boolean success Whether or not applying damage to this character was successful
 		damage = function(self, amount)
 			local data = self:get_data()
 
@@ -2094,18 +2119,25 @@ cuhFramework.characters.spawnCharacter = function(position, outfit_id)
 			return true
 		end,
 
-		---Get raw Stormworks data from this character
-		---@return SWObjectData|nil character_data The data of this character, or nil if failed to get data
 		get_data = function(self)
 			return server.getObjectData(self.properties.object_id)
 		end
 	}
+
+	return cuhFramework.characters.spawnedCharacters[object_id]
+end
+
+---Get character by object ID
+---@param object_id integer The object ID of the character
+---@return character|nil character The character, or nil if no character found
+cuhFramework.characters.getCharacterByObjectId = function(object_id)
+	return cuhFramework.characters.spawnedCharacters[object_id]
 end
 
 ---Despawn a character
 ---@param object_id integer The object ID of the character you want to despawn
 ---@return boolean success Whether or not despawning this character was successful
-cuhFramework.characters.despawnCreature = function(object_id)
+cuhFramework.characters.despawnCharacter = function(object_id)
 	cuhFramework.characters.spawnedCharacters[object_id] = nil
 	return server.despawnObject(object_id, true)
 end
@@ -2164,7 +2196,6 @@ cuhFramework.ui.screen.create = function(id, text, x, y, player)
 		properties = cuhFramework.ui.screen.activeUI[id],
 
 		---Remove this UI
-		---@return nil
 		remove = function(self)
 			return cuhFramework.ui.screen.remove(self.properties.id)
 		end,
@@ -2174,7 +2205,6 @@ cuhFramework.ui.screen.create = function(id, text, x, y, player)
 		---@param new_x number|nil What the new X should be, set to nil if you don't want to change
 		---@param new_y number|nil What the new Y should be, set to nil if you don't want to change
 		---@param new_player player|nil The player to show this UI to. Set to nil if you don't want to change, or set to -1 if you want to show this UI object to all
-		---@return nil
 		edit = function(self, new_text, new_x, new_y, new_player)
 			self.properties.x = new_x or self.properties.x
 			self.properties.y = new_y or self.properties.y
@@ -2191,7 +2221,6 @@ cuhFramework.ui.screen.create = function(id, text, x, y, player)
 
 		---Set the visibility of this UI
 		---@param shouldShow boolean If true, the UI will be shown. Opposite if false.
-		---@return nil
 		setVisibility = function(self, shouldShow)
 			local v_peer_id = -1
 
@@ -2207,7 +2236,6 @@ end
 
 ---Remove a screen UI object
 ---@param id integer The ID of the UI object
----@return nil
 cuhFramework.ui.screen.remove = function(id)
 	local uiObject = cuhFramework.ui.screen.activeUI[id]
 
@@ -2222,6 +2250,65 @@ cuhFramework.ui.screen.remove = function(id)
 	end
 
 	cuhFramework.ui.screen.activeUI[id] = nil
+end
+
+------------------------
+------Notifications UI
+------------------------
+cuhFramework.ui.notifications = {}
+
+---Show a success notification
+---@param text string The text to display in the notification
+---@param player player|nil The player to show the notification to. If this is nil, everyone sees it
+cuhFramework.ui.notifications.success = function(text, player)
+	local target = -1
+
+	if player then
+		target = player.properties.peer_id
+	end
+
+	server.notify(target, "Success", text, 4)
+end
+
+---Show a warning notification
+---@param text string The text to display in the notification
+---@param player player|nil The player to show the notification to. If this is nil, everyone sees it
+cuhFramework.ui.notifications.warning = function(text, player)
+	local target = -1
+
+	if player then
+		target = player.properties.peer_id
+	end
+
+	server.notify(target, "Warning", text, 1)
+end
+
+---Show a failure notification
+---@param text string The text to display in the notification
+---@param player player|nil The player to show the notification to. If this is nil, everyone sees it
+cuhFramework.ui.notifications.failure = function(text, player)
+	local target = -1
+
+	if player then
+		target = player.properties.peer_id
+	end
+
+	server.notify(target, "Failure", text, 3)
+end
+
+---Show a custom notification
+---@param title string The title of the notification
+---@param text string The text to display in the notification
+---@param player player|nil The player to show the notification to. If this is nil, everyone sees it
+---@param notification_type SWNotifiationTypeEnum|nil The notification type, aka the icon in the notification. If nil, it will become 4 (complete_mission, green success icon)
+cuhFramework.ui.notifications.custom = function(title, text, player, notification_type)
+	local target = -1
+
+	if player then
+		target = player.properties.peer_id
+	end
+
+	server.notify(target, title, text, notification_type or 4)
 end
 
 ----------------------------------------
@@ -2295,7 +2382,6 @@ cuhFramework.customZones.createPlayerZone = function(position, size, callback)
 		properties = cuhFramework.customZones.activePlayerZones[id],
 
 		---Remove this zone
-		---@return nil
 		remove = function(self)
 			cuhFramework.customZones.removePlayerZone(self.properties.id)
 		end,
@@ -2304,7 +2390,6 @@ cuhFramework.customZones.createPlayerZone = function(position, size, callback)
 		---@param new_position SWMatrix|nil What the new position should be, set to nil if you don't want to change
 		---@param new_size number|nil What the new size should be, set to nil if you don't want to change
 		---@param new_callback function|nil What the new callback should be, set to nil if you don't want to change
-		---@return nil
 		edit = function(self, new_position, new_size, new_callback)
 			self.properties.position = new_position or self.properties.position
 			self.properties.size = new_size or self.properties.size
@@ -2326,7 +2411,6 @@ end
 
 ---Remove a player zone
 ---@param id integer The ID of the player zone
----@return nil
 cuhFramework.customZones.removePlayerZone = function(id)
 	local zone = cuhFramework.customZones.activePlayerZones[id]
 
@@ -2385,7 +2469,6 @@ cuhFramework.customZones.createVehicleZone = function(position, size, callback)
 		properties = cuhFramework.customZones.activeVehicleZones[id],
 
 		---Remove this zone
-		---@return nil
 		remove = function(self)
 			cuhFramework.customZones.removeVehicleZone(self.properties.id)
 		end,
@@ -2394,7 +2477,6 @@ cuhFramework.customZones.createVehicleZone = function(position, size, callback)
 		---@param new_position SWMatrix|nil What the new position should be, set to nil if you don't want to change
 		---@param new_size number|nil What the new size should be, set to nil if you don't want to change
 		---@param new_callback function|nil What the new callback should be, set to nil if you don't want to change
-		---@return nil
 		edit = function(self, new_position, new_size, new_callback)
 			self.properties.position = new_position or self.properties.position
 			self.properties.size = new_size or self.properties.size
@@ -2416,7 +2498,6 @@ end
 
 ---Remove a vehicle zone
 ---@param id integer The ID of the vehicle zone
----@return nil
 cuhFramework.customZones.removeVehicleZone = function(id)
 	local zone = cuhFramework.customZones.activeVehicleZones[id]
 
@@ -2705,6 +2786,7 @@ cuhFramework.references.matrix = matrix
 ------Miscellaneous
 ------------------------
 cuhFramework.references.explode = server.spawnExplosion
+cuhFramework.references.httpGet = server.httpGet
 
 ------------------------------------------------------------------------
 ------------------------------------------------------------------------
