@@ -1743,11 +1743,13 @@ cuhFramework.callbacks.onPlayerJoin:connect(function(steam_id, name, peer_id, is
 	cuhFramework.backend.givePlayerData(steam_id, name, peer_id, is_admin, is_auth)
 
 	-- and show running ui (extremely useful)
-	for i, v in pairs(cuhFramework.ui.screen.activeUI) do
-		if not v.player then
-			server.setPopupScreen(peer_id, v.id, "", v.visible, v.text, v.x, v.y)
+	cuhFramework.utilities.delay.create(0.05, function()
+		for i, v in pairs(cuhFramework.ui.screen.activeUI) do
+			if not v.player then
+				server.setPopupScreen(peer_id, v.id, "", v.visible, v.text, v.x, v.y)
+			end
 		end
-	end
+	end)
 end)
 
 for i, v in pairs(server.getPlayers()) do
