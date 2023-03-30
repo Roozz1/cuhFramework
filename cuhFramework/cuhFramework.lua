@@ -1582,12 +1582,10 @@ end)
 ---@param player player|nil The player to send the message to. If this is nil, the message will be sent to everyone
 ---@return nil
 cuhFramework.chat.send_message = function(author, message, player)
-	local msg = ""
+	local msg = tostring(message)
 
 	if type(message) == "table" then
 		msg = table.concat(cuhFramework.utilities.table.tostringValues(message), " ")
-	elseif type(message) == "string" then
-		msg = message
 	end
 
 	if player then
