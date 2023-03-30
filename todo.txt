@@ -1,6 +1,9 @@
 - savedata functions
 - ui notification functioins
 - cod zombies cuhframework showcase addon, upload to workshop too
+- cooldown functions
+- scatter pos function
+- table.utilities get table count function (in case #tbl doesnt work)
 
 - getRandomValue() in utilities.table (done)
 - tps stuff (done)
