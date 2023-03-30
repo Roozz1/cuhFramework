@@ -1929,7 +1929,7 @@ end
 ---@param object_id integer The object ID of the object you want to despawn
 ---@return boolean success Whether or not despawning this object was successful
 cuhFramework.object.despawnObject = function(object_id)
-	cuhFramework.creatures.spawnedCreatures[object_id] = nil
+	cuhFramework.objects.spawnedObjects[object_id] = nil
 	return server.despawnObject(object_id, true)
 end
 
