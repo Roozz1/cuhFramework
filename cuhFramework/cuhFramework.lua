@@ -1754,7 +1754,7 @@ cuhFramework.callbacks.onPlayerJoin:connect(function(steam_id, name, peer_id, is
 	cuhFramework.utilities.delay.create(0.05, function()
 		for i, v in pairs(cuhFramework.ui.screen.activeUI) do
 			if not v.properties.player then
-				server.setPopupScreen(peer_id, v.id, "", v.visible, v.text, v.x, v.y)
+				server.setPopupScreen(peer_id, v.properties.id, "", v.properties.visible, v.properties.text, v.properties.x, v.properties.y)
 			end
 		end
 	end)
