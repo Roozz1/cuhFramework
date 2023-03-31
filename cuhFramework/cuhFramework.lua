@@ -2486,7 +2486,7 @@ cuhFramework.customZones.createVehicleZone = function(position, size, callback)
 			for i, vehicle in pairs(cuhFramework.vehicles.spawnedVehicles) do
 				local distance = cuhFramework.references.matrix.distance(vehicle:get_position(), zone.position)
 
-				if not zone.blacklist[vehicle.properties.vehicle_id] then
+				if not zone.backend_blacklist[vehicle.properties.vehicle_id] then
 					if distance <= zone.size then
 						if not zone.vehiclesInZone[vehicle.properties.vehicle_id] then
 							zone.vehiclesInZone[vehicle.properties.vehicle_id] = vehicle
