@@ -2175,7 +2175,7 @@ end
 ------------------------
 ------Intellisense
 ------------------------
----@class ui_data
+---@class screenUiProperties
 ---@field x integer horizontal_offset, -1 = left, 1 = right
 ---@field y integer vertical_offset, -1 = bottom, 1 = top
 ---@field text string The text this UI object is showing
@@ -2183,12 +2183,18 @@ end
 ---@field id integer The ID of this UI object
 ---@field visible boolean Whether or not this UI object is visible
 
+---@class screenUiObject
+---@field properties screenUiProperties The properties of this screen UI object
+---@field remove function<screenUiObject> Remove this UI
+---@field edit function<screenUiObject, string, number, number, player> Edit this UI (new_text, new_x, new_y, and player can be nil)
+---@field setVisibility function<screenUiObject, boolean> Whether or not this UI is visible
+
 ------------------------
 ------Screen UI
 ------------------------
 cuhFramework.ui.screen = {}
 
----@type table<integer, ui_data>
+---@type table<integer, screenUiObject>
 cuhFramework.ui.screen.activeUI = {}
 
 ---Create a screen UI object for a player
@@ -2197,38 +2203,22 @@ cuhFramework.ui.screen.activeUI = {}
 ---@param x number -1 = left, 1 = right
 ---@param y number -1 = bottom, 1 = top
 ---@param player player|nil The player to show this UI object to
+---@return screenUiObject
 cuhFramework.ui.screen.create = function(id, text, x, y, player)
 	cuhFramework.ui.screen.activeUI[id] = {
-		x = x,
-		y = y,
-		text = text,
-		player = player,
-		id = id,
-		visible = true
-	}
+		properties = {
+			x = x,
+			y = y,
+			text = text,
+			player = player,
+			id = id,
+			visible = true
+		},
 
-	local peer_id = -1
-
-	if player then
-		peer_id = player.properties.peer_id
-	end
-
-	cuhFramework.references.createScreenPopup(peer_id, id, "", true, text, x, y)
-
-	return {
-		---@type ui_data
-		properties = cuhFramework.ui.screen.activeUI[id],
-
-		---Remove this UI
 		remove = function(self)
 			return cuhFramework.ui.screen.remove(self.properties.id)
 		end,
 
-		---Edit this UI
-		---@param new_text SWMatrix|nil What the new text should be, set to nil if you don't want to change
-		---@param new_x number|nil What the new X should be, set to nil if you don't want to change
-		---@param new_y number|nil What the new Y should be, set to nil if you don't want to change
-		---@param new_player player|nil The player to show this UI to. Set to nil if you don't want to change, or set to -1 if you want to show this UI object to all
 		edit = function(self, new_text, new_x, new_y, new_player)
 			self.properties.x = new_x or self.properties.x
 			self.properties.y = new_y or self.properties.y
@@ -2243,8 +2233,6 @@ cuhFramework.ui.screen.create = function(id, text, x, y, player)
 			self:setVisibility(self.properties.visible) -- refresh ui
 		end,
 
-		---Set the visibility of this UI
-		---@param shouldShow boolean If true, the UI will be shown. Opposite if false.
 		setVisibility = function(self, shouldShow)
 			local v_peer_id = -1
 
@@ -2256,6 +2244,15 @@ cuhFramework.ui.screen.create = function(id, text, x, y, player)
 			self.properties.visible = shouldShow
 		end
 	}
+
+	local peer_id = -1
+
+	if player then
+		peer_id = player.properties.peer_id
+	end
+
+	cuhFramework.references.createScreenPopup(peer_id, id, "", true, text, x, y)
+	return cuhFramework.ui.screen.activeUI[id]
 end
 
 ---Remove a screen UI object
