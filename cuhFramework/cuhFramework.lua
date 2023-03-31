@@ -2403,8 +2403,11 @@ cuhFramework.customZones.createPlayerZone = function(position, size, callback)
 		backend_checkIfPlayerLeft = cuhFramework.callbacks.onPlayerLeave:connect(function(_, _, peer_id)
 			local data = cuhFramework.customZones.activePlayerZones[id]
 			local player = cuhFramework.players.getPlayerByPeerId(peer_id)
-			data.playersInZone[peer_id] = nil
-			data.callback(player, false)
+
+			if data.playersInZone[peer_id] then
+				data.playersInZone[peer_id] = nil
+				data.callback(player, false)
+			end
 		end)
 	}
 
@@ -2498,8 +2501,11 @@ cuhFramework.customZones.createVehicleZone = function(position, size, callback)
 		backend_checkIfVehicleDespawned = cuhFramework.callbacks.onVehicleDespawn:connect(function(vehicle_id)
 			local data = cuhFramework.customZones.activeVehicleZones[id]
 			local vehicle = cuhFramework.vehicles.getVehicleByVehicleId(vehicle_id)
-			data.vehiclesInZone[vehicle_id] = nil
-			data.callback(vehicle, false)
+
+			if data.vehiclesInZone[vehicle_id] then
+				data.vehiclesInZone[vehicle_id] = nil
+				data.callback(vehicle, false)
+			end
 		end)
 	}
 
