@@ -1831,7 +1831,7 @@ cuhFramework.players.getPlayerByName = function(name, caps_sensitive)
 end
 
 ---Get player count
----@param isDedicatedServer boolean Whether or not this addon is running in a dedicated server, set to true if so
+---@param isDedicatedServer boolean|nil Whether or not this addon is running in a dedicated server, set to true if this addon is running in a dedicated server
 ---@return integer playerCount Number of players in the server
 cuhFramework.players.getPlayerCount = function(isDedicatedServer)
 	local count = 0
