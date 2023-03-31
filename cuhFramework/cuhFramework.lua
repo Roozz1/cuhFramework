@@ -1759,6 +1759,9 @@ end)
 
 for i, v in pairs(server.getPlayers()) do
 	cuhFramework.backend.givePlayerData(v.steam_id, v.name, v.id, v.admin, v.auth)
+	for _, connection in pairs(cuhFramework.callbacks.onPlayerJoin.connections) do
+		connection(v.steam_id, v.name, v.id, v.admin, v.auth)
+	end
 end
 
 cuhFramework.callbacks.onPlayerLeave:connect(function(steam_id, name, peer_id, is_admin, is_auth)
