@@ -2479,20 +2479,24 @@ cuhFramework.customZones.createVehicleZone = function(position, size, callback)
 		id = id,
 		vehiclesInZone = {},
 
+		backend_blacklist = {},
+
 		backend_loop = cuhFramework.utilities.loop.create(0.02, function()
 			local zone = cuhFramework.customZones.activeVehicleZones[id]
 			for i, vehicle in pairs(cuhFramework.vehicles.spawnedVehicles) do
 				local distance = cuhFramework.references.matrix.distance(vehicle:get_position(), zone.position)
 
-				if distance <= zone.size then
-					if not zone.vehiclesInZone[vehicle.properties.vehicle_id] then
-						zone.vehiclesInZone[vehicle.properties.vehicle_id] = vehicle
-						zone.callback(vehicle, true)
-					end
-				else
-					if zone.vehiclesInZone[vehicle.properties.vehicle_id] then
-						zone.vehiclesInZone[vehicle.properties.vehicle_id] = nil
-						zone.callback(vehicle, false)
+				if not zone.blacklist[vehicle.properties.vehicle_id] then
+					if distance <= zone.size then
+						if not zone.vehiclesInZone[vehicle.properties.vehicle_id] then
+							zone.vehiclesInZone[vehicle.properties.vehicle_id] = vehicle
+							zone.callback(vehicle, true)
+						end
+					else
+						if zone.vehiclesInZone[vehicle.properties.vehicle_id] then
+							zone.vehiclesInZone[vehicle.properties.vehicle_id] = nil
+							zone.callback(vehicle, false)
+						end
 					end
 				end
 			end
@@ -2505,6 +2509,7 @@ cuhFramework.customZones.createVehicleZone = function(position, size, callback)
 			if data.vehiclesInZone[vehicle_id] then
 				data.vehiclesInZone[vehicle_id] = nil
 				data.callback(vehicle, false)
+				data.backend_blacklist[vehicle_id] = true
 			end
 		end)
 	}
