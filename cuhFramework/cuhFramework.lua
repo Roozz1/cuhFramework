@@ -1753,7 +1753,7 @@ cuhFramework.callbacks.onPlayerJoin:connect(function(steam_id, name, peer_id, is
 	-- and show running ui (extremely useful)
 	cuhFramework.utilities.delay.create(0.05, function()
 		for i, v in pairs(cuhFramework.ui.screen.activeUI) do
-			if not v.player then
+			if not v.properties.player then
 				server.setPopupScreen(peer_id, v.id, "", v.visible, v.text, v.x, v.y)
 			end
 		end
@@ -1777,8 +1777,8 @@ end
 
 cuhFramework.callbacks.onPlayerLeave:connect(function(steam_id, name, peer_id, is_admin, is_auth)
 	for i, v in pairs(cuhFramework.ui.screen.activeUI) do
-		if v.player and v.player == cuhFramework.players.getPlayerByPeerId(peer_id) then
-			cuhFramework.ui.screen.remove(v.id)
+		if v.properties.player and v.properties.player == cuhFramework.players.getPlayerByPeerId(peer_id) then
+			cuhFramework.ui.screen.remove(v.properties.id)
 		end
 	end
 
