@@ -2673,7 +2673,7 @@ cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_i
 			local vehicle_pos, success = self:get_position()
 
 			if success then
-				cuhFramework.references.explode(vehicle_pos, 0.5)
+				cuhFramework.references.explode(vehicle_pos, 0.1)
 			end
 
 			self:despawn()
