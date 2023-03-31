@@ -2264,6 +2264,7 @@ cuhFramework.ui.screen.remove = function(id)
 	local uiObject = cuhFramework.ui.screen.activeUI[id]
 
 	if not uiObject then
+		cuhFramework.references.removePopup(-1, id)
 		return
 	end
 
