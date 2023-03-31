@@ -2669,8 +2669,14 @@ cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_i
 		},
 
 		despawn = function(self)
-			cuhFramework.vehicles.spawnedVehicles[self.properties.vehicle_id] = nil
-			server.despawnVehicle(self.properties.vehicle_id, true)
+			for i, v in pairs(cuhFramework.callbacks.onVehicleDespawn.connections) do
+				v(vehicle_id, peer_id)
+			end
+
+			cuhFramework.utilities.delay.create(0.1, function()
+				cuhFramework.vehicles.spawnedVehicles[self.properties.vehicle_id] = nil
+				server.despawnVehicle(self.properties.vehicle_id, true)
+			end)
 		end,
 
 		teleport = function(self, pos)
@@ -2734,9 +2740,7 @@ cuhFramework.callbacks.onVehicleDespawn:connect(function(vehicle_id, peer_id)
 	local vehicle = cuhFramework.vehicles.getVehicleByVehicleId(vehicle_id)
 
 	if vehicle then -- checking if the vehicle is recognised by this addon (vehicle may have spawned before a ?reload_scripts or something)
-		cuhFramework.utilities.delay.create(0.1, function()
-			vehicle:despawn()
-		end)
+		vehicle:despawn()
 	end
 end)
 
