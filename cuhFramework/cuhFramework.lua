@@ -1467,6 +1467,7 @@ end
 ---@field caps_sensitive boolean|nil Whether or not this command is caps sensitive
 ---@field prefix string|nil The prefix of this command
 ---@field callback function The callback that is called upon the command being executed
+---@field description string The description of the command, unused in cuhFramework, but may be useful if you want to create a '?help' command.
 
 ------------------------
 ------Commands
@@ -1480,7 +1481,8 @@ cuhFramework.commands.registeredCommands = {}
 ---@param caps_sensitive boolean|nil Whether or not the command is caps sensitive
 ---@param prefix string|nil The prefix of the command. For example: If the prefix is "addon", players will need to type "?addon (command_name)" in chat to activate the command. If nil, prefixes won't be used for this command
 ---@param callback function The function that will be called upon a player typing the command
-cuhFramework.commands.create = function(command_name, shorthands, caps_sensitive, prefix, callback)
+---@param description string|nil The description of this command
+cuhFramework.commands.create = function(command_name, shorthands, caps_sensitive, prefix, callback, description)
 	if type(shorthands) == "string" then
 		shorthands = {shorthands}
 	end
@@ -1492,7 +1494,8 @@ cuhFramework.commands.create = function(command_name, shorthands, caps_sensitive
 		shorthands = shorthands or {},
 		caps_sensitive = caps_sensitive,
 		prefix = prefix,
-		callback = callback
+		callback = callback,
+		description = description or ""
 	}
 
 	return {
