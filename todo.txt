@@ -1,7 +1,7 @@
 - savedata functions
-- cod zombies cuhframework showcase addon, upload to workshop too
 - cooldown functions
 
+- cod zombies cuhframework showcase addon, upload to workshop too (done)
 - remove ui assigned to a player when they leave (done)
 - scatter pos function (done)
 - table.utilities get table count function (in case #tbl doesnt work) (done)

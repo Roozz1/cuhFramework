@@ -2688,7 +2688,7 @@ cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_i
 		despawn = function(self)
 			server.despawnVehicle(self.properties.vehicle_id, true)
 			cuhFramework.utilities.delay.create(0.1, function()
-				cuhFramework.vehicles.spawnedVehicles[self.properties.vehicle_id] = nil
+				cuhFramework.vehicles.despawnVehicle(self.properties.vehicle_id)
 			end)
 		end,
 
@@ -2751,7 +2751,7 @@ end)
 
 cuhFramework.callbacks.onVehicleDespawn:connect(function(vehicle_id, peer_id)
 	cuhFramework.utilities.delay.create(0.1, function()
-		cuhFramework.vehicles.spawnedVehicles[vehicle_id] = nil
+		cuhFramework.vehicles.despawnVehicle(vehicle_id)
 	end)
 end)
 
@@ -2765,7 +2765,8 @@ cuhFramework.vehicles.spawnAddonVehicle = function(playlist_id, position)
 end
 
 ---Get a vehicle by its vehicle ID
----@param vehicle_id integer Vehicle ID of the vehicle you want to get
+---@param vehicle_id integer Vehicle ID of the vehicle you want to retrieve
+---@return vehicle|nil vehicle The retrieved vehicle
 cuhFramework.vehicles.getVehicleByVehicleId = function(vehicle_id)
 	return cuhFramework.vehicles.spawnedVehicles[vehicle_id]
 end
@@ -2799,6 +2800,18 @@ cuhFramework.vehicles.getVehicleCount = function()
 	end
 
 	return count
+end
+
+---Despawn vehicle
+---@param vehicle_id integer The vehicle ID of the vehicle you want to despawn
+cuhFramework.vehicles.despawnVehicle = function(vehicle_id)
+	server.despawnVehicle(vehicle_id, true)
+
+	for i, v in pairs(cuhFramework.vehicles.spawnedVehicles) do -- "spawnedVehicles[vehicle_id] = nil" isn't working and its fucking killing me
+		if v.properties.vehicle_id == vehicle_id then
+			table.remove(cuhFramework.vehicles.spawnedVehicles, i)
+		end
+	end
 end
 
 ----------------------------------------
