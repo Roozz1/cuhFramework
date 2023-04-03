@@ -2672,6 +2672,10 @@ cuhFramework.vehicles.spawnedVehicles = {}
 
 -- Update spawnedVehicles [Backend]
 cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_id, x, y, z, cost)
+	if cuhFramework.vehicles.spawnedVehicles[vehicle_id] then
+		return
+	end
+
 	local data = {
 		properties = {
 			vehicle_id = vehicle_id,
@@ -2751,7 +2755,8 @@ end)
 
 cuhFramework.callbacks.onVehicleDespawn:connect(function(vehicle_id, peer_id)
 	cuhFramework.utilities.delay.create(0.1, function()
-		cuhFramework.vehicles.despawnVehicle(vehicle_id)
+		-- cuhFramework.vehicles.despawnVehicle(vehicle_id)
+		cuhFramework.vehicles.spawnedVehicles[vehicle_id] = nil
 	end)
 end)
 
@@ -2773,7 +2778,7 @@ end
 
 ---Get a list of vehicles owned by a player
 ---@param player player The player to check, use cuhFramework.players.getPlayerByPeerId() to get the player from a peer ID, see documentation
----@return table<integer, vehicle>|nil vehicles Table of all vehicles owned by this player, or nil if no vehicles
+---@return table<integer, vehicle> vehicles Table of all vehicles owned by this player, or nil if no vehicles
 cuhFramework.vehicles.getAllVehiclesOwnedByPlayer = function(player)
 	local list = {}
 
@@ -2783,11 +2788,7 @@ cuhFramework.vehicles.getAllVehiclesOwnedByPlayer = function(player)
 		end
 	end
 
-	if list[1] then
-		return list
-	else
-		return nil
-	end
+	return list
 end
 
 ---Get vehicle count
@@ -2806,12 +2807,7 @@ end
 ---@param vehicle_id integer The vehicle ID of the vehicle you want to despawn
 cuhFramework.vehicles.despawnVehicle = function(vehicle_id)
 	server.despawnVehicle(vehicle_id, true)
-
-	for i, v in pairs(cuhFramework.vehicles.spawnedVehicles) do -- "spawnedVehicles[vehicle_id] = nil" isn't working and its fucking killing me
-		if v.properties.vehicle_id == vehicle_id then
-			table.remove(cuhFramework.vehicles.spawnedVehicles, i)
-		end
-	end
+	cuhFramework.vehicles.spawnedVehicles[vehicle_id] = nil
 end
 
 ----------------------------------------
