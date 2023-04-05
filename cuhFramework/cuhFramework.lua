@@ -2282,6 +2282,14 @@ cuhFramework.ui.screen.remove = function(id)
 	cuhFramework.ui.screen.activeUI[id] = nil
 end
 
+---Get a screen UI object
+---@param id integer The ID of the UI object
+---@return screenUiObject|nil uiObject The retrieved UI object, or nil if none found.
+cuhFramework.ui.screen.get = function(id)
+	local uiObject = cuhFramework.ui.screen.activeUI[id]
+	return uiObject
+end
+
 ------------------------
 ------Notifications UI
 ------------------------
