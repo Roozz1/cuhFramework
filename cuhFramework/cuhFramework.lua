@@ -1994,7 +1994,7 @@ end
 ---@field kill function<creature> Kill this creature
 ---@field get_position function<creature> Get the position of this creature
 ---@field damage function<creature, number> Damage this creature, negative number = heal
----@field set_move_target function<creature, SWMatrix> Make the creature walk to this position
+---@field set_move_target function<creature, SWMatrix> Make the creature walk to a position
 ---@field get_data function<creature> Returns the raw data of this creature provided by Stormworks
 
 ------------------------
