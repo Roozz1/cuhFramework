@@ -2099,6 +2099,9 @@ end
 ---@field get_position function<character> Get the position of this character
 ---@field damage function<character, number> Damage this character, negative number = heal
 ---@field get_data function<character> Returns the raw data of this character provided by Stormworks
+---@field set_item function<character, SWSlotNumberEnum, SWEquipmentTypeEnum, integer, number, boolean> Give this character an item
+---@field has_item function<character, SWSlotNumberEnum> Whether or not this character has an item in the specified slot
+---@field remove_item function<character, SWSlotNumberEnum> Remove the item in the specified slot on this character
 
 ------------------------
 ------Characters
@@ -2153,6 +2156,20 @@ cuhFramework.characters.spawnCharacter = function(position, outfit_id)
 
 		get_data = function(self)
 			return server.getObjectData(self.properties.object_id)
+		end,
+
+		set_item = function(self, slot, equipment_id, int, float, active)
+			local obj_id = self.properties.object_id
+			return server.setCharacterItem(obj_id, slot, equipment_id, active, int, float)
+		end,
+
+		has_item = function(self, slot)
+			local obj_id = self.properties.object_id
+			return (server.getCharacterItem(obj_id, slot)) ~= (nil and 0)
+		end,
+
+		remove_item = function(self, slot)
+			return self:set_item(slot, 0, 0, 0, false)
 		end
 	}
 
@@ -2273,8 +2290,8 @@ cuhFramework.ui.screen.remove = function(id)
 		return
 	end
 
-	if uiObject.player then
-		cuhFramework.references.removePopup(uiObject.player.properties.peer_id, id)
+	if uiObject.properties.player then
+		cuhFramework.references.removePopup(uiObject.properties.player.peer_id, id)
 	else
 		cuhFramework.references.removePopup(-1, id)
 	end
@@ -2284,7 +2301,7 @@ end
 
 ---Get a screen UI object
 ---@param id integer The ID of the UI object
----@return screenUiObject|nil uiObject The retrieved UI object, or nil if none found.
+---@return screenUiObject|nil uiObject The retrieved UI object, or nil if none found
 cuhFramework.ui.screen.get = function(id)
 	local uiObject = cuhFramework.ui.screen.activeUI[id]
 	return uiObject
