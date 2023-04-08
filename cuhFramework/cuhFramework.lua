@@ -2668,7 +2668,7 @@ end
 ---@field properties vehicleProperties The properties of this vehicle
 ---@field despawn function<vehicle> Despawn this vehicle
 ---@field teleport function<vehicle, SWMatrix> Teleport this vehicle
----@field explode function<vehicle> Explodes this vehicle and despawns it
+---@field explode function<vehicle, number|nil> Explodes this vehicle and despawns it
 ---@field get_position function<vehicle, number?, number?, number?> Get the position of this vehicle. The voxel parameters are optional
 ---@field set_tooltip function<vehicle, string> Sets the tooltip of this vehicle
 ---@field set_invulnerability function<vehicle, boolean> Sets the invulnerability of this vehicle to whatever you specify (true = this vehicle can receive no damage, false = this vehicle can receive damage)
@@ -2682,10 +2682,6 @@ cuhFramework.vehicles.spawnedVehicles = {}
 
 -- Update spawnedVehicles [Backend]
 cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_id, x, y, z, cost)
-	if cuhFramework.vehicles.spawnedVehicles[vehicle_id] then
-		return
-	end
-
 	local data = {
 		properties = {
 			vehicle_id = vehicle_id,
@@ -2710,11 +2706,11 @@ cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_i
 			return server.setVehiclePos(self.properties.vehicle_id, pos)
 		end,
 
-		explode = function(self)
+		explode = function(self, magnitude)
 			local vehicle_pos, success = self:get_position()
 
 			if success then
-				cuhFramework.references.explode(vehicle_pos, 0.1)
+				cuhFramework.references.explode(vehicle_pos, magnitude or 0.1)
 			end
 
 			self:despawn()
@@ -2737,7 +2733,7 @@ cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_i
 		end
 	}
 
-	cuhFramework.vehicles.spawnedVehicles[vehicle_id] = data
+	table.insert(cuhFramework.vehicles.spawnedVehicles, data)
 end
 
 cuhFramework.backend.vehicle_load_setVehicleData = function(vehicle_id)
@@ -2765,8 +2761,7 @@ end)
 
 cuhFramework.callbacks.onVehicleDespawn:connect(function(vehicle_id, peer_id)
 	cuhFramework.utilities.delay.create(0.1, function()
-		-- cuhFramework.vehicles.despawnVehicle(vehicle_id)
-		cuhFramework.vehicles.spawnedVehicles[vehicle_id] = nil
+		cuhFramework.vehicles.despawnVehicle(vehicle_id)
 	end)
 end)
 
@@ -2783,7 +2778,11 @@ end
 ---@param vehicle_id integer Vehicle ID of the vehicle you want to retrieve
 ---@return vehicle|nil vehicle The retrieved vehicle
 cuhFramework.vehicles.getVehicleByVehicleId = function(vehicle_id)
-	return cuhFramework.vehicles.spawnedVehicles[vehicle_id]
+	for i, v in pairs(cuhFramework.vehicles.spawnedVehicles) do -- yea i know i should do direct lookups but that didnt work for some reason
+		if v.properties.vehicle_id == vehicle_id then
+			return v
+		end
+	end
 end
 
 ---Get a list of vehicles owned by a player
@@ -2817,7 +2816,12 @@ end
 ---@param vehicle_id integer The vehicle ID of the vehicle you want to despawn
 cuhFramework.vehicles.despawnVehicle = function(vehicle_id)
 	server.despawnVehicle(vehicle_id, true)
-	cuhFramework.vehicles.spawnedVehicles[vehicle_id] = nil
+
+	for i, v in pairs(cuhFramework.vehicles.spawnedVehicles) do
+		if v.properties.vehicle_id == vehicle_id then
+			table.remove(cuhFramework.vehicles.spawnedVehicles, i)
+		end
+	end
 end
 
 ----------------------------------------
