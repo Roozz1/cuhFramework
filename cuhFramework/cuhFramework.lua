@@ -1328,7 +1328,7 @@ cuhFramework.utilities.delay.update = function()
 	for i, v in pairs(cuhFramework.utilities.delay.ongoingDelays) do
 		local timeNow = server.getTimeMillisec()
 		if timeNow >= v.creationTime + (v.time * 1000) and not v.paused then
-			v.callback(v.id)
+			v.callback(v.id, table.unpack(v.args))
 			cuhFramework.utilities.delay.remove(v.id)
 		end
 	end
@@ -1339,11 +1339,13 @@ cuhFramework.backend.updates:insert(cuhFramework.utilities.delay.update) -- refe
 ---Call a function after x seconds
 ---@param duration number How long until the callback is called in seconds
 ---@param callback function The function to call after the delay is manually called or when the delay naturally completes itself
-cuhFramework.utilities.delay.create = function(duration, callback)
+---@param ... any Arguments to pass through to the delay callback
+cuhFramework.utilities.delay.create = function(duration, callback, ...)
     local id = #cuhFramework.utilities.delay.ongoingDelays + 1
 
 	cuhFramework.utilities.delay.ongoingDelays[id] = {
 		callback = callback,
+		args = {...},
 		time = duration,
 		creationTime = server.getTimeMillisec(),
 		id = id,
@@ -1395,7 +1397,7 @@ cuhFramework.utilities.loop.update = function()
 	for i, v in pairs(cuhFramework.utilities.loop.ongoingLoops) do
 		local timeNow = server.getTimeMillisec()
 		if timeNow >= v.creationTime + (v.time * 1000) and not v.paused then
-			v.callback(v.id)
+			v.callback(v.id, table.unpack(v.args))
 			v.creationTime = timeNow
 		end
 	end
@@ -1406,11 +1408,13 @@ cuhFramework.backend.updates:insert(cuhFramework.utilities.loop.update) -- refer
 ---Call a function every x seconds
 ---@param duration number How long until the callback is called in seconds
 ---@param callback function The function to call after the loop is manually called or when a loop iteration has completed
-cuhFramework.utilities.loop.create = function(duration, callback)
+---@param ... any Arguments to pass through to the loop callback
+cuhFramework.utilities.loop.create = function(duration, callback, ...)
     local id = #cuhFramework.utilities.loop.ongoingLoops + 1
 
 	cuhFramework.utilities.loop.ongoingLoops[id] = {
 		callback = callback,
+		args = {...},
 		time = duration,
 		creationTime = server.getTimeMillisec(),
 		id = id,
