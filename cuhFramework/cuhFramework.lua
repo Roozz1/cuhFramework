@@ -1646,6 +1646,7 @@ end
 ---@field auth boolean Whether or not this player is authed
 ---@field name string The name of this player
 ---@field steam_id integer The steam_id of this player
+---@field disconnecting boolean Whether or not the player is leaving the server
 
 ---@class player
 ---@field properties playerProperties The properties of this player
@@ -1677,6 +1678,7 @@ cuhFramework.backend.givePlayerData = function(steam_id, name, peer_id, is_admin
 			auth = is_auth,
 			name = name,
 			steam_id = steam_id,
+			disconnecting = false
 		},
 
 		kick = function(self)
@@ -1786,7 +1788,11 @@ cuhFramework.callbacks.onPlayerLeave:connect(function(steam_id, name, peer_id, i
 		end
 	end
 
-	cuhFramework.players.connectedPlayers[peer_id] = nil
+	cuhFramework.players.connectedPlayers[peer_id].disconnecting = true
+
+	cuhFramework.utilities.delay.create(0.01, function()
+		cuhFramework.players.connectedPlayers[peer_id] = nil
+	end)
 end)
 
 ---Get a player by their peer_id
