@@ -2735,7 +2735,7 @@ cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_i
 		end,
 
 		set_invulnerability = function(self, state)
-			return server.setVehicleInvulnerable(self.properties.vehicle, state)
+			return server.setVehicleInvulnerable(self.properties.vehicle_id, state)
 		end,
 
 		repair = function(self)
