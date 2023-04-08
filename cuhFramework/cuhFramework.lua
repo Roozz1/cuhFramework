@@ -1763,16 +1763,14 @@ end)
 for i, v in pairs(server.getPlayers()) do
 	cuhFramework.backend.givePlayerData(v.steam_id, v.name, v.id, v.admin, v.auth)
 
-	cuhFramework.utilities.delay.create(0.1, function()
-		for _, connection in pairs(cuhFramework.callbacks.onPlayerJoin.connections) do
-			connection(v.steam_id, v.name, v.id, v.admin, v.auth)
-		end
+	for _, connection in pairs(cuhFramework.callbacks.onPlayerJoin.connections) do
+		connection(v.steam_id, v.name, v.id, v.admin, v.auth)
+	end
 
-		local char_id = server.getPlayerCharacterID(v.id)
-		for _, connection in pairs(cuhFramework.callbacks.onObjectLoad.connections) do
-			connection(char_id)
-		end
-	end)
+	local char_id = server.getPlayerCharacterID(v.id)
+	for _, connection in pairs(cuhFramework.callbacks.onObjectLoad.connections) do
+		connection(char_id)
+	end
 end
 
 cuhFramework.callbacks.onPlayerLeave:connect(function(steam_id, name, peer_id, is_admin, is_auth)
@@ -1994,7 +1992,7 @@ end
 ---@field kill function<creature> Kill this creature
 ---@field get_position function<creature> Get the position of this creature
 ---@field damage function<creature, number> Damage this creature, negative number = heal
----@field set_move_target function<creature, SWMatrix> Make the creature walk to a position
+---@field set_move_target function<creature, SWMatrix> Make the creature walk to this position
 ---@field get_data function<creature> Returns the raw data of this creature provided by Stormworks
 
 ------------------------
@@ -2099,9 +2097,6 @@ end
 ---@field get_position function<character> Get the position of this character
 ---@field damage function<character, number> Damage this character, negative number = heal
 ---@field get_data function<character> Returns the raw data of this character provided by Stormworks
----@field set_item function<character, SWSlotNumberEnum, SWEquipmentTypeEnum, integer, number, boolean> Give this character an item
----@field has_item function<character, SWSlotNumberEnum> Whether or not this character has an item in the specified slot
----@field remove_item function<character, SWSlotNumberEnum> Remove the item in the specified slot on this character
 
 ------------------------
 ------Characters
@@ -2156,20 +2151,6 @@ cuhFramework.characters.spawnCharacter = function(position, outfit_id)
 
 		get_data = function(self)
 			return server.getObjectData(self.properties.object_id)
-		end,
-
-		set_item = function(self, slot, equipment_id, int, float, active)
-			local obj_id = self.properties.object_id
-			return server.setCharacterItem(obj_id, slot, equipment_id, active, int, float)
-		end,
-
-		has_item = function(self, slot)
-			local obj_id = self.properties.object_id
-			return (server.getCharacterItem(obj_id, slot)) ~= (nil and 0)
-		end,
-
-		remove_item = function(self, slot)
-			return self:set_item(slot, 0, 0, 0, false)
 		end
 	}
 
