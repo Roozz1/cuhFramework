@@ -1760,18 +1760,18 @@ cuhFramework.callbacks.onPlayerJoin:connect(function(steam_id, name, peer_id, is
 	end)
 end)
 
-for i, v in pairs(server.getPlayers()) do
-	cuhFramework.backend.givePlayerData(v.steam_id, v.name, v.id, v.admin, v.auth)
+cuhFramework.utilities.delay.create(0.01, function()
+	for i, v in pairs(server.getPlayers()) do
+		for _, connection in pairs(cuhFramework.callbacks.onPlayerJoin.connections) do
+			connection(v.steam_id, v.name, v.id, v.admin, v.auth)
+		end
 
-	for _, connection in pairs(cuhFramework.callbacks.onPlayerJoin.connections) do
-		connection(v.steam_id, v.name, v.id, v.admin, v.auth)
+		local char_id = server.getPlayerCharacterID(v.id)
+		for _, connection in pairs(cuhFramework.callbacks.onObjectLoad.connections) do
+			connection(char_id)
+		end
 	end
-
-	local char_id = server.getPlayerCharacterID(v.id)
-	for _, connection in pairs(cuhFramework.callbacks.onObjectLoad.connections) do
-		connection(char_id)
-	end
-end
+end)
 
 cuhFramework.callbacks.onPlayerLeave:connect(function(steam_id, name, peer_id, is_admin, is_auth)
 	for i, v in pairs(cuhFramework.ui.screen.activeUI) do
