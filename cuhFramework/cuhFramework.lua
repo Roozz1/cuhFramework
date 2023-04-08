@@ -1779,14 +1779,14 @@ end)
 
 cuhFramework.callbacks.onPlayerLeave:connect(function(steam_id, name, peer_id, is_admin, is_auth)
 	for i, v in pairs(cuhFramework.ui.screen.activeUI) do
-		if v.properties.player and v.properties.player == cuhFramework.players.getPlayerByPeerId(peer_id) then
-			cuhFramework.ui.screen.remove(v.properties.id)
+		if v.properties.player then
+			if v.properties.player == cuhFramework.players.getPlayerByPeerId(peer_id) then
+				cuhFramework.ui.screen.remove(v.properties.id)
+			end
 		end
 	end
 
-	cuhFramework.utilities.delay.create(0.05, function() -- wait some time before removing data, that way addon developers can get the player data of someone that has left
-		cuhFramework.players.connectedPlayers[peer_id] = nil
-	end)
+	cuhFramework.players.connectedPlayers[peer_id] = nil
 end)
 
 ---Get a player by their peer_id
