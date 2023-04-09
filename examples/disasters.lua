@@ -1,5 +1,5 @@
 ------------------------------------------------------------------------
-    --cuhFramework || An addon creation framework to make SW addon development easier. 
+    -- cuhFramework || An addon creation framework to make SW addon development easier. 
 	-- 		Created by cuh4#7366
 	--		cuhHub - Stormworks Server Hub: https://discord.gg/zTQxaZjwDr
 	--		This framework is open-source: https://github.com/Roozz1/cuhFramework
