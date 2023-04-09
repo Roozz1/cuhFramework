@@ -4,7 +4,7 @@
 	--		cuhHub - Stormworks Server Hub: https://discord.gg/zTQxaZjwDr
 	--		This framework is open-source: https://github.com/Roozz1/cuhFramework
 ------------------------------------------------------------------------
---------- Example:
+--------- Example - Zones, Creatures, and Characters:
 -- Get the host
 local host = cuhFramework.players.getPlayerByPeerId(0)
 
@@ -18,7 +18,7 @@ local character = cuhFramework.characters.spawnCharacter(host:get_position(), 1)
 if creature and character then -- The creature may not spawn if we have entered a value incorrectly, so we are checking if it did before we do anything else
     cuhFramework.utilities.loop.create(0.01, function()
         local pos = host:get_position() -- Get position of host
-        creature:setMoveTarget(pos) -- Set move target
+        creature:set_move_target(pos) -- Set move target
         character:teleport(creature:get_position()) -- Teleport character to creature
     end)
 end

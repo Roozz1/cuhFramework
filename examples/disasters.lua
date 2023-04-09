@@ -4,7 +4,7 @@
 	--		cuhHub - Stormworks Server Hub: https://discord.gg/zTQxaZjwDr
 	--		This framework is open-source: https://github.com/Roozz1/cuhFramework
 ------------------------------------------------------------------------
---------- Example:
+--------- Example - Disasters:
 -- Create a command that spawns a meteor at the player's location
 cuhFramework.commands.create("meteor", {"m"}, false, nil, function(_, peer_id)
     local player = cuhFramework.players.getPlayerByPeerId(peer_id) -- Get the player that ran this command

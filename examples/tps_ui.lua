@@ -4,7 +4,7 @@
 	--		cuhHub - Stormworks Server Hub: https://discord.gg/zTQxaZjwDr
 	--		This framework is open-source: https://github.com/Roozz1/cuhFramework
 ------------------------------------------------------------------------
---------- Example:
+--------- Example - TPS and UI:
 -- Create a screen UI object
 local ui = cuhFramework.ui.screen.create(1, "--TPS--\nLoading...", -0.9, 0)
 

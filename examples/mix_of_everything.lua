@@ -4,7 +4,7 @@
 	--		cuhHub - Stormworks Server Hub: https://discord.gg/zTQxaZjwDr
 	--		This framework is open-source: https://github.com/Roozz1/cuhFramework
 ------------------------------------------------------------------------
---------- Example:
+--------- Example - Mix of Everything:
 -- Note: host = player with peer_id 0, aka the player that created the server, or the server itself in dedicated servers
 cuhFramework.utilities.loop.create(6, function()
     -- Get host
