@@ -1942,12 +1942,14 @@ end)
 
 ---Get a player by their peer_id
 ---@param peer_id integer Peer ID of the player you want to get
+---@return player|nil player The retrieved player, or nil if no player found
 cuhFramework.players.getPlayerByPeerId = function(peer_id)
 	return cuhFramework.players.connectedPlayers[peer_id]
 end
 
 ---Get a player by their Steam ID
 ---@param steam_id integer Steam ID of the player you want to get
+---@return player|nil player The retrieved player, or nil if no player found
 cuhFramework.players.getPlayerBySteamId = function(steam_id)
 	for i, v in pairs(cuhFramework.players.connectedPlayers) do
 		if cuhFramework.utilities.string.tostring(v.properties.steam_id) == cuhFramework.utilities.string.tostring(steam_id) then
@@ -1958,6 +1960,7 @@ end
 
 ---Get a player by an object ID
 ---@param object_id integer The object ID of the player
+---@return player|nil player The retrieved player, or nil if no player found
 cuhFramework.players.getPlayerByObjectId = function(object_id)
 	for i, v in pairs(cuhFramework.players.connectedPlayers) do
 		if (server.getPlayerCharacterID(v.properties.peer_id)) == object_id then
@@ -1969,6 +1972,7 @@ end
 ---Get a player by their Steam ID
 ---@param name string Name of the player
 ---@param caps_sensitive boolean Whether or not the search should be caps sensitive
+---@return player|nil player The retrieved player, or nil if no player found
 cuhFramework.players.getPlayerByName = function(name, caps_sensitive)
 	for i, v in pairs(cuhFramework.players.connectedPlayers) do
 		if caps_sensitive then
@@ -2060,7 +2064,7 @@ end
 ---@field get_data function<object> Returns the raw data of this object provided by Stormworks
 
 ------------------------
-------Creatures
+------Objects
 ------------------------
 ---@type table<integer, object>
 cuhFramework.objects.spawnedObjects = {}
@@ -2267,7 +2271,7 @@ cuhFramework.characters.spawnCharacter = function(position, outfit_id)
 	local object_id, success = server.spawnCharacter(position, outfit_id)
 
 	if not success then
-		return nil
+		return
 	end
 
 	cuhFramework.characters.spawnedCharacters[object_id] = {
