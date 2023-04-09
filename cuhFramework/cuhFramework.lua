@@ -44,6 +44,7 @@ cuhFramework = {
 	customZones = {},
 	ui = {},
 	disasters = {},
+	animation = {},
 
 	utilities = {},
 	callbacks = {},
@@ -1320,7 +1321,6 @@ end
 ------Delays
 ------------------------
 cuhFramework.utilities.delay = {}
-
 cuhFramework.utilities.delay.ongoingDelays = {}
 
 ---Update delays, don't use this
@@ -1389,7 +1389,6 @@ end
 ------Loops
 ------------------------
 cuhFramework.utilities.loop = {}
-
 cuhFramework.utilities.loop.ongoingLoops = {}
 
 ---Update loops, don't use this
@@ -1453,6 +1452,154 @@ end
 cuhFramework.utilities.loop.remove = function(id)
 	cuhFramework.utilities.loop.ongoingLoops[id] = nil
 end
+
+------------------------
+------Animation
+------------------------
+
+------------------------
+------Intellisense
+------------------------
+---@class animation_data
+---@field start_pos SWMatrix The start position of the animation
+---@field current_pos SWMatrix The position the animation is currently at
+---@field destination_pos SWMatrix The end position of the animation
+---@field paused boolean Whether or not the animation is paused
+---@field looping boolean Whether or not the animation repeats after
+---@field increment number I can't think of the right words to use to explain this, you probably know what this is though, mainly because you're a smart, lovable human being, and you are truly awesome. You make other people's days good, even when you're having a bad day, and that is why you are truly awesome and lovable. You are the person everyone looks up to when they desire to be a perfect human being. Keep being you. Because you are amazing.
+---@field callback function The function that is called every animation tick. One argument is passed through, the animation data
+---@field id integer The ID of this animation
+---@field finished boolean Whether or not the animation has been completed.
+
+------------------------
+------Animation
+------------------------
+---@type table<integer, animation_data>
+cuhFramework.animation.ongoingAnimations = {}
+
+---Create an animation. Does not support rotation, only XYZ position. All animations are only linear
+---@param start_position SWMatrix The position for the animation to start at
+---@param desired_position SWMatrix The position for the animation to end at
+---@param increment number I can't think of the right words to use to explain this, you probably know what this is though, mainly because you're a smart, lovable human being, and you are truly awesome. You make other people's days good, even when you're having a bad day, and that is why you are truly awesome and lovable. You are the person everyone looks up to when they desire to be a perfect human being. Keep being you. Because you are amazing.
+---@param should_loop boolean Whether or not the animation should repeat upon reaching the desired position
+---@param callback function<animation_data> The function that is called every animation tick. One argument is passed through, the animation data
+cuhFramework.animation.createAnimation = function(start_position, desired_position, increment, should_loop, callback)
+	local id = #cuhFramework.animation.ongoingAnimations + 1
+	cuhFramework.animation.ongoingAnimations[id] = {
+		start_pos = start_position,
+		current_pos = matrix.translation(start_position[13], start_position[14], start_position[15]),
+		destination_pos = desired_position,
+		paused = false,
+		looping = should_loop,
+		increment = increment,
+		callback = callback,
+		id = id,
+		finished = false
+	}
+
+	return {
+		properties = cuhFramework.animation.ongoingAnimations[id],
+
+		---Remove the animation
+		---@return nil
+		remove = function(self)
+			return cuhFramework.animation.removeAnimation(self.properties.id)
+		end,
+
+		---Pause/unpause the animation
+		---@param state boolean true = pause, false = unpause
+		---@return nil
+		setPaused = function(self, state)
+			self.properties.paused = state
+		end,
+
+		---Set whether or not the animation loops
+		---@param state boolean true = loop, false = don't loop
+		---@return nil
+		setLooped = function(self, state)
+			self.properties.looping = state
+		end,
+
+		---Whether or not the animation is finished
+		---@return boolean finished
+		isFinished = function(self)
+			return self.properties.finished
+		end,
+
+		---Edit the animation's start position and destination position
+		---@param new_start_position SWMatrix|nil The new start position, if nil, it will not be changed
+		---@param new_destination_position SWMatrix|nil The new destination position, if nil, it will not be changed
+		---@param new_current_position SWMatrix|nil The new current position, if nil, it will not be changed
+		---@param new_increment number|nil The new increment, if nil, it will not be changed
+		---@return nil
+		edit = function(self, new_start_position, new_destination_position, new_current_position, new_increment)
+			self.properties.start_pos = new_start_position or self.properties.start_pos
+			self.properties.destination_pos = new_destination_position or self.properties.destination_pos
+			self.properties.current_pos = new_current_position or self.properties.current_pos
+			self.properties.increment = new_increment or self.properties.increment
+		end
+	}
+end
+
+---Remove an animation by its ID
+---@param id integer The ID of the animation. You can get the ID of an animation on creation. For example: cuhFramework.animation.createAnimation(...).properties.id
+---@return nil
+cuhFramework.animation.removeAnimation = function(id)
+	cuhFramework.animation.ongoingAnimations[id] = nil
+end
+
+---Manage animations
+cuhFramework.backend.updates:insert(function()
+	for i, v in pairs(cuhFramework.animation.ongoingAnimations) do
+		-- quick check
+		if v.paused then
+			goto continue
+		end
+
+		if v.looping and v.finished then
+			v.finished = false
+		end
+
+		-- it gets messy kinda, but yeah main animation handling stuff here
+		local got_to_destination_count = 0
+		for i2 = 1, 3 do
+			-- check if reached destination, fuck precision all the homies hate precision btw
+			if v.current_pos[12 + i2] > v.destination_pos[12 + i2] - v.increment and v.current_pos[12 + i2] < v.destination_pos[12 + i2] + v.increment then
+				got_to_destination_count = got_to_destination_count + 1
+				goto continue
+			end
+
+			-- some checks and moving and some stuff too and other stuff
+			if v.current_pos[12 + i2] < v.destination_pos[12 + i2] then
+				v.current_pos[12 + i2] = v.current_pos[12 + i2] + v.increment
+			elseif v.current_pos[12 + i2] > v.destination_pos[12 + i2] then
+				v.current_pos[12 + i2] = v.current_pos[12 + i2] - v.increment
+			end
+
+			-- jggjh
+		    ::continue::
+		end
+
+		-- check if animation is done
+		if got_to_destination_count == 3 then -- 3 because x y z
+			-- set finished
+			v.finished = true
+
+			-- repeat anim
+			if v.looping then
+				local old = v.start_pos
+				v.start_pos = v.destination_pos
+				v.destination_pos = old
+			end
+		end
+
+		-- call callback, also since we are using ":", v is passed into the function!! wooooooooo!!!!!
+		v:callback()
+
+		-- good old goto statement
+	    ::continue::
+	end
+end)
 
 ----------------------------------------
 ----------------------------------------
@@ -1650,11 +1797,11 @@ end
 
 ---@class player
 ---@field properties playerProperties The properties of this player
----@field kick function<player, nil> Kick this player
----@field ban function<player, nil> Ban this player
----@field kill function<player, nil> Kills this player
+---@field kick function<player> Kick this player
+---@field ban function<player> Ban this player
+---@field kill function<player> Kills this player
 ---@field teleport function<player, SWMatrix> Teleport this player to a position
----@field fake_chat function<player, string, integer|nil> Send a fake message that seems like this player sent it
+---@field fake_chat function<player, string, player|nil> Send a fake message that seems like this player sent it
 ---@field get_position function<player, nil> Returns the position of this player as a matrix
 ---@field setAdmin function<player, boolean> Gives this player admin/Removes it
 ---@field setAuth function<player, boolean> Gives this player auth/Removes it
@@ -1693,8 +1840,8 @@ cuhFramework.backend.givePlayerData = function(steam_id, name, peer_id, is_admin
 			return server.setPlayerPos(self.properties.peer_id, pos)
 		end,
 
-		fake_chat = function(self, message, target_peer_id)
-			cuhFramework.chat.send_message(self.properties.name, message, target_peer_id)
+		fake_chat = function(self, message, target_player)
+			cuhFramework.chat.send_message(self.properties.name, message, target_player)
 		end,
 
 		get_position = function(self)
@@ -1766,18 +1913,16 @@ cuhFramework.callbacks.onPlayerJoin:connect(function(steam_id, name, peer_id, is
 	end)
 end)
 
-cuhFramework.utilities.delay.create(0.01, function()
-	for i, v in pairs(server.getPlayers()) do
-		for _, connection in pairs(cuhFramework.callbacks.onPlayerJoin.connections) do
-			connection(v.steam_id, v.name, v.id, v.admin, v.auth)
-		end
-
-		local char_id = server.getPlayerCharacterID(v.id)
-		for _, connection in pairs(cuhFramework.callbacks.onObjectLoad.connections) do
-			connection(char_id)
-		end
+for i, v in pairs(server.getPlayers()) do
+	for _, connection in pairs(cuhFramework.callbacks.onPlayerJoin.connections) do
+		connection(v.steam_id, v.name, v.id, v.admin, v.auth)
 	end
-end)
+
+	local char_id = server.getPlayerCharacterID(v.id)
+	for _, connection in pairs(cuhFramework.callbacks.onObjectLoad.connections) do
+		connection(char_id)
+	end
+end
 
 cuhFramework.callbacks.onPlayerLeave:connect(function(steam_id, name, peer_id, is_admin, is_auth)
 	for i, v in pairs(cuhFramework.ui.screen.activeUI) do
@@ -2202,7 +2347,7 @@ end
 ---@class screenUiObject
 ---@field properties screenUiProperties The properties of this screen UI object
 ---@field remove function<screenUiObject> Remove this UI
----@field edit function<screenUiObject, string, number, number, player> Edit this UI (new_text, new_x, new_y, and player can be nil)
+---@field edit function<screenUiObject, string, number, number, player> Edit this UI (new_text, new_x, new_y, and player can be nil). If any of these parameters are nil, then the corresponding property will not be changed
 ---@field setVisibility function<screenUiObject, boolean> Whether or not this UI is visible
 
 ------------------------
