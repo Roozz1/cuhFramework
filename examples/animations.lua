@@ -27,7 +27,7 @@ if host then
 
             -- Now we edit the destination position of this animation to the position above
             anim:edit(nil, new_pos)
-            -- anim:edit(new_start_pos, new_dest_pos, new_current_pos, new_increment) -- nil = don't change
+            -- anim:edit(new_start_pos, new_dest_pos, new_current_pos, new_increment) -- nil = doesn't change
 
             -- Finally, we teleport the character to the current position in the animation
             char:teleport(animation_data.current_pos)
