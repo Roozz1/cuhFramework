@@ -5,7 +5,7 @@
 	--		This framework is open-source: https://github.com/Roozz1/cuhFramework
 ------------------------------------------------------------------------
 --------- Example - Animations:
--- Let's get the host, and the host's position
+-- Let's get the host player
 local host = cuhFramework.players.getPlayerByPeerId(0)
 
 -- Real quick, let's check if the host actually exists, which should always be the case
@@ -18,7 +18,7 @@ if host then
 
     -- Now that we've spawned a character, let's make sure it was successful
     if char then
-        -- Now, let's create a little animation, starting at the host's position offset by 10 on the Z axis, and ending at 0, 0, 0. The animation also loops since we have set it to loop ("true"), and the increment is 0.1.
+        -- Now, let's create a little animation, starting at the host's position offset by 10 on the Z axis, and ending at 0, 0, 0. The animation also loops since we have set it to loop ("true"), and the increment is 0.1
         ---@param animation_data animation_data
         anim = cuhFramework.animation.createAnimation(cuhFramework.utilities.matrix.offsetPosition(pos, 0, 0, 10), matrix.translation(0, 0, 0), 0.1, true, function(animation_data)
             -- This callback gets called every tick, with the animation data being passed through
