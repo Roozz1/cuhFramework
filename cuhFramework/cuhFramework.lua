@@ -45,6 +45,7 @@ cuhFramework = {
 	ui = {},
 	disasters = {},
 	animation = {},
+	http = {},
 
 	utilities = {},
 	callbacks = {},
@@ -2003,6 +2004,74 @@ cuhFramework.players.getPlayerCount = function(isDedicatedServer)
 		return count
 	end
 end
+
+----------------------------------------
+----------------------------------------
+--//Framework - HTTP\\--
+----------------------------------------
+----------------------------------------
+
+------------------------
+------Intellisense
+------------------------
+---@class http_get_request
+---@field port integer The port of the request
+---@field url string The URL of the request (eg: "/my_thingy". you can only send a rqeuest ot localhost)
+---@field callback function The function that will be called when this request receives a reply
+---@field id integer The ID of the request data
+
+------------------------
+------HTTP
+------------------------
+---@type table<integer, http_get_request>
+cuhFramework.http.requests = {}
+
+---Send a get request
+---@param url string The URL to send the request to (example: "/my_thingy"). You cannot send a request to anywhere but localhost because Stormworks is silly like that
+---@param port integer The port of the request
+---@param reply_callback function The function that will be called when a reply is received. An argument is passed through to this function, the response of the request
+cuhFramework.http.get = function(url, port, reply_callback)
+	local id = #cuhFramework.http.requests + 1
+	cuhFramework.http.requests[id] = {
+		port = port,
+		url = url,
+		callback = reply_callback,
+		id = id
+	}
+
+	return {
+		properties = cuhFramework.http.requests[id],
+
+		---Cancel this request
+		---@return nil
+		cancel = function(self)
+			cuhFramework.http.cancel(self.properties.id)
+		end
+	}
+end
+
+---Cancel a request by its ID
+---@param id integer The ID of the request
+---@return nil
+cuhFramework.http.cancel = function(id)
+	cuhFramework.http.requests[id] = nil
+end
+
+---Determines whether or not a request was successful, recommended to use in the reply callback when sending a get request
+---@param response boolean The response of the request
+---@return boolean ok Whether or not the request was successful
+cuhFramework.http.ok = function(response)
+	return response ~= ("Connection closed unexpectedly" and "connect(): Connection refused")
+end
+
+---Manage requests
+cuhFramework.callbacks.httpReply:connect(function(port, url, response)
+	for i, v in pairs(cuhFramework.http.requests) do
+		if v.port == port and v.url == url then
+			v.callback(response)
+		end
+	end
+end)
 
 ----------------------------------------
 ----------------------------------------
