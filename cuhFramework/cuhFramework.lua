@@ -1805,7 +1805,7 @@ end
 ---@field get_position function<player, nil> Returns the position of this player as a matrix
 ---@field setAdmin function<player, boolean> Gives this player admin/Removes it
 ---@field setAuth function<player, boolean> Gives this player auth/Removes it
----@field giveItem function<player, SWSlotNumberEnum, SWEquipmentTypeEnum, integer, integer, float, boolean|nil> Gives this player an item
+---@field giveItem function<player, SWSlotNumberEnum, SWEquipmentTypeEnum, integer, float, boolean|nil> Gives this player an item
 ---@field removeItem function<player, SWSlotNumberEnum> Removes an item in the specified slot from this player
 ---@field hasItem function<player, SWSlotNumberEnum> Whether or not this player has an item in a slot
 ---@field damage function<player, number> Apply damage to a player, pass a negative number to heal
