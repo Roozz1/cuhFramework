@@ -1655,7 +1655,7 @@ cuhFramework.savedata.add = function(parent, value, index)
 end
 
 ---Remove a value from save data
----@param parent table|nil The table within savedata to remove the value from. If nil, the savedata table itself will be the parent
+---@param parent string|nil The name of the data parent to remove the value from. If nil, the savedata table itself will be the parent
 ---@param value any The value to remove. Cannot be a function
 ---@param index any The index to use when searching for the value to remove (instead of looping through the values, it returns parent[index]). If nil, this function will just loop through the values to find and remove the passed value
 ---@return nil
@@ -1674,7 +1674,7 @@ cuhFramework.savedata.remove = function(parent, value, index)
 end
 
 ---Get a value from save data
----@param parent table|nil The table within savedata to get the value from. If nil, the savedata table itself will be the parent that the function looks through
+---@param parent string|nil The name of the data parent to get the value from. If nil, the savedata table itself will be the parent that the function looks through
 ---@param value any The value to find
 ---@param index any The index to use when searching (instead of looping through the values, it returns parent[index]). If nil, this function will just loop through the values to find the desired value
 ---@return any|nil value The retrieved value, or nil if not found
