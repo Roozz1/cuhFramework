@@ -1633,6 +1633,8 @@ g_savedata = {}
 ------------------------
 ------Savedata
 ------------------------
+cuhFramework.savedata.saved_data = g_savedata
+
 ---Save a value to save data. Functions cannot be saved
 ---@param parent table|nil The table within savedata to add the value to. If nil, the savedata table itself will be the parent
 ---@param value any The value to save. Cannot be a function
