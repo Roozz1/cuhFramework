@@ -39,7 +39,7 @@ cuhFramework = {
 	objects = {},
 	creatures = {},
 	characters = {},
-	saveData = {},
+	savedata = {},
 	tps = {},
 	customZones = {},
 	ui = {},
@@ -75,13 +75,6 @@ cuhFramework = {
 
 ----------------------------------------
 ----------------------------------------
---//Backend - Save Data\\--
-----------------------------------------
-----------------------------------------
-g_savedata = {}
-
-----------------------------------------
-----------------------------------------
 --//Backend - Updates [DO NOT USE]\\--
 ----------------------------------------
 ----------------------------------------
@@ -113,7 +106,7 @@ cuhFramework.callbacks.onTick = {
 function onTick(...)
 	-- Backend - Update
 	for i, v in pairs(cuhFramework.backend.updates) do
-		if cuhFramework.utilities.table.valueInTable(cuhFramework.backend.updates.exceptions, v) then
+		if cuhFramework.utilities.table.isValueInTable(cuhFramework.backend.updates.exceptions, v) then -- yeah this isn't so good for performance but oh well
 			goto continue
 		end
 
@@ -1086,7 +1079,7 @@ cuhFramework.utilities.table = {}
 ---@param tbl table Table to look in
 ---@param value any What value to look for in the table
 ---@return boolean found Whether or not the value was found
-cuhFramework.utilities.table.valueInTable = function(tbl, value)
+cuhFramework.utilities.table.isValueInTable = function(tbl, value)
 	for i, v in pairs(tbl) do
 		if v == value then
 			return true
@@ -1094,6 +1087,33 @@ cuhFramework.utilities.table.valueInTable = function(tbl, value)
 	end
 
 	return false
+end
+
+---Remove a value from a table
+---@param tbl table Table to look in
+---@param value any What value to remove from the table
+---@return boolean removed Whether or not the value was found and removed
+cuhFramework.utilities.table.removeValueFromTable = function(tbl, value)
+	for i, v in pairs(tbl) do
+		if v == value then
+			tbl[i] = nil
+			return true
+		end
+	end
+
+	return false
+end
+
+---Get a value from a table
+---@param tbl table Table to look in
+---@param value any What value to look for in the table
+---@return any|nil value The value, or nil if not found
+cuhFramework.utilities.table.getValueInTable = function(tbl, value)
+	for i, v in pairs(tbl) do
+		if v == value then
+			return v
+		end
+	end
 end
 
 ---Whether or not an index exists in a table
@@ -1605,6 +1625,81 @@ end)
 ----------------------------------------
 ----------------------------------------
 ----------------------------------------
+--//Framework - Savedata\\--
+----------------------------------------
+----------------------------------------
+g_savedata = {}
+
+------------------------
+------Savedata
+------------------------
+---Save a value to save data. Functions cannot be saved
+---@param parent table|nil The table within savedata to add the value to. If nil, the savedata table itself will be the parent
+---@param value string|number|boolean The value to save. Cannot be a function
+---@param index string|number|boolean|nil The index of the value. If nil, none will be used. Example (if nil): {value1, value}. Example (if not nil): {index_here = value1, index_here = value}. Cannot be a function
+---@return nil
+cuhFramework.savedata.add = function(parent, value, index)
+	local target = g_savedata
+
+	if parent then
+		target = parent
+	end
+
+	if index then
+		target[index] = value
+	else
+		cuhFramework.utilities.table.insert(target, value)
+	end
+end
+
+---Remove a value from save data
+---@param parent table|nil The table within savedata to remove the value from. If nil, the savedata table itself will be the parent
+---@param value string|number|boolean The value to remove. Cannot be a function
+---@param index string|number|boolean|nil The index to use when searching for the value to remove (instead of looping through the values, it returns parent[index]). If nil, this function will just loop through the values to find and remove the passed value
+---@return nil
+cuhFramework.savedata.remove = function(parent, value, index)
+	local target = g_savedata
+
+	if parent then
+		target = parent
+	end
+
+	if index then
+		target[index] = nil
+	else
+		cuhFramework.utilities.table.removeValueFromTable(target, value)
+	end
+end
+
+---Save the game, only works in dedicated servers. Pretty much an alias to server.save()
+---@param save_name string|nil The name of the save. If nil, autosave will be used (I think)
+---@return nil
+cuhFramework.savedata.save = function(save_name)
+	return server.save(save_name)
+end
+
+---Get a value from save data
+---@param parent table|nil The table within savedata to get the value from. If nil, the savedata table itself will be the parent that the function looks through
+---@param value string|number|boolean The value to find
+---@param index string|number|boolean|nil The index to use when searching (instead of looping through the values, it returns parent[index]). If nil, this function will just loop through the values to find the desired value
+---@return any|nil value The retrieved value, or nil if not found
+cuhFramework.savedata.get = function(parent, value, index)
+	local target = g_savedata
+
+	if parent then
+		target = parent
+	end
+
+	if index then
+		return target[index]
+	else
+		return cuhFramework.utilities.table.getValueInTable(target, value)
+	end
+end
+
+----------------------------------------
+----------------------------------------
+----------------------------------------
 --//Framework - Commands\\--
 ----------------------------------------
 ----------------------------------------
@@ -1615,7 +1710,7 @@ end)
 ---@class command
 ---@field id integer The ID of this command
 ---@field command_name string The name of this command
----@field shorthands string|table|nil The shorthands of this command
+---@field shorthands table The shorthands of this command
 ---@field caps_sensitive boolean|nil Whether or not this command is caps sensitive
 ---@field prefix string|nil The prefix of this command
 ---@field callback function The callback that is called upon the command being executed
@@ -1733,12 +1828,12 @@ cuhFramework.callbacks.onCustomCommand:connect(function(msg, peer_id, is_admin, 
 
 		-- caps sensitive
 		if v.caps_sensitive then
-			if v.command_name == lookFor or cuhFramework.utilities.table.valueInTable(v.shorthands, lookFor) then
+			if v.command_name == lookFor or cuhFramework.utilities.table.isValueInTable(v.shorthands, lookFor) then
 				v.callback(msg, peer_id, is_admin, is_auth, lookFor, ...)
 			end
 		else
 			-- not caps sensitive
-			if v.command_name:lower() == lookFor:lower() or cuhFramework.utilities.table.valueInTable(cuhFramework.utilities.table.lowercaseStringValues(v.shorthands), lookFor:lower()) then
+			if v.command_name:lower() == lookFor:lower() or cuhFramework.utilities.table.isValueInTable(cuhFramework.utilities.table.lowercaseStringValues(v.shorthands), lookFor:lower()) then
 				v.callback(msg, peer_id, is_admin, is_auth, lookFor, ...)
 			end
 		end

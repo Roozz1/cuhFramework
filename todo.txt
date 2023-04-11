@@ -1,8 +1,10 @@
-- savedata functions
 - cooldown functions
 - physical ui (for object id and vehicle id stuff, make an attach method that handles it)
-- http functions with a reply callback
 
+- more table utility functions (done)
+- savedata functions (done)
+- more annotations (done)
+- http functions with a reply callback (done)
 - animation functions, only linear animations though because im a lazy bastard (done)
 - cod zombies cuhframework showcase addon, upload to workshop too (done)
 - remove ui assigned to a player when they leave (done)
