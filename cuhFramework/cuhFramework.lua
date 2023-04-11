@@ -1636,59 +1636,62 @@ g_savedata = {}
 cuhFramework.savedata.saved_data = g_savedata
 
 ---Save a value to save data. Functions cannot be saved
----@param parent string|nil The name of the data parent to add the value to. If nil, the savedata table itself will be the parent
 ---@param value any The value to save. Cannot be a function
----@param index any The index of the value. If nil, none will be used. Example (if nil): {value1, value}. Example (if not nil): {index_here = value1, index_here = value}. Cannot be a function
+---@param index any The index of the value. If nil, none will be used. Example (if nil): {value1, value}. Example (if not nil): {index_here = value1, index_here = value}. Cannot be a function. The index is also converted to a string
+---@param key string|nil The key to give the value, can be nil if the value doesn't have a key. This is useless if index is nil
 ---@return nil
-cuhFramework.savedata.add = function(parent, value, index)
-	local target = g_savedata
+cuhFramework.savedata.add = function(value, index, key)
+	key = tostring(key)
+	index = tostring(index)
 
-	if parent then
-		target = g_savedata[parent]
+	if index and key then
+		index = key..index
 	end
 
 	if index then
-		target[index] = value
+		g_savedata[index] = value
 	else
-		cuhFramework.utilities.table.insert(target, value)
+		cuhFramework.utilities.table.insert(g_savedata, value)
 	end
 end
 
 ---Remove a value from save data
----@param parent string|nil The name of the data parent to remove the value from. If nil, the savedata table itself will be the parent
 ---@param value any The value to remove. Cannot be a function
 ---@param index any The index to use when searching for the value to remove (instead of looping through the values, it returns parent[index]). If nil, this function will just loop through the values to find and remove the passed value
+---@param key string|nil The key of the value, can be nil if the value doesn't have a key. This is useless if index is nil
 ---@return nil
-cuhFramework.savedata.remove = function(parent, value, index)
-	local target = g_savedata
+cuhFramework.savedata.remove = function(value, index, key)
+	key = tostring(key)
+	index = tostring(index)
 
-	if parent then
-		target = g_savedata[parent]
+	if key and index then
+		index = key..index
 	end
 
 	if index then
-		target[index] = nil
+		g_savedata[index] = nil
 	else
-		cuhFramework.utilities.table.removeValueFromTable(target, value)
+		cuhFramework.utilities.table.removeValueFromTable(g_savedata, value)
 	end
 end
 
 ---Get a value from save data
----@param parent string|nil The name of the data parent to get the value from. If nil, the savedata table itself will be the parent that the function looks through
 ---@param value any The value to find
 ---@param index any The index to use when searching (instead of looping through the values, it returns parent[index]). If nil, this function will just loop through the values to find the desired value
+---@param key string|nil The key of the value, can be nil if the value doesn't have a key. This is useless if index is nil
 ---@return any|nil value The retrieved value, or nil if not found
-cuhFramework.savedata.get = function(parent, value, index)
-	local target = g_savedata
+cuhFramework.savedata.get = function(value, index, key)
+	key = tostring(key)
+	index = tostring(index)
 
-	if parent then
-		target = g_savedata[parent]
+	if key and index then
+		index = key..index
 	end
 
 	if index then
-		return target[index]
+		return g_savedata[index]
 	else
-		return cuhFramework.utilities.table.getValueInTable(target, value)
+		return cuhFramework.utilities.table.getValueInTable(g_savedata, value)
 	end
 end
 
@@ -1700,40 +1703,6 @@ end
 ---@return nil
 cuhFramework.savedata.save = function(save_name)
 	return server.save(save_name)
-end
-
-------------------------
-------Parents
-------------------------
----Whether or not a save data parent (table within g_savedata that stores data, think subfolders in a folder) exists
----@param name string The name of the parent
----@return boolean exists Whether or not the parent exists
-cuhFramework.savedata.parentExists = function(name)
-	if g_savedata[name] then
-		if type(g_savedata[name]) == "table" then
-			return true
-		end
-	end
-
-	return false
-end
-
----Create a parent
----@param name string The name of the parent
----@return nil
-cuhFramework.savedata.createParent = function(name)
-	if not cuhFramework.savedata.parentExists(name) then
-		g_savedata[name] = {}
-	end
-end
-
----Remove a parent by its name
----@param name string The name of the parent
----@return nil
-cuhFramework.savedata.removeParent = function(name)
-	if cuhFramework.savedata.parentExists(name) then
-		g_savedata[name] = nil
-	end
 end
 
 ----------------------------------------
