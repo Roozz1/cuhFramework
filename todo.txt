@@ -1,7 +1,8 @@
 - cooldown functions
 - physical ui (for object id and vehicle id stuff, make an attach method that handles it)
-- pid functions
 
+- more vehicle methods (done)
+- more player methods (done)
 - more table utility functions (done)
 - savedata functions (done)
 - more annotations (done)

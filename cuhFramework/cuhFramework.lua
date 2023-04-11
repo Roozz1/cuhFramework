@@ -1928,6 +1928,8 @@ end
 ---@field removeItem function<player, SWSlotNumberEnum> Removes an item in the specified slot from this player
 ---@field hasItem function<player, SWSlotNumberEnum> Whether or not this player has an item in a slot
 ---@field damage function<player, number> Apply damage to a player, pass a negative number to heal
+---@field get_character function<player> Returns the object ID of this player's character
+---@field seat function<player, vehicle, seat_name> Places this player in a seat
 
 ------------------------
 ------Players
@@ -1967,7 +1969,7 @@ cuhFramework.backend.givePlayerData = function(steam_id, name, peer_id, is_admin
 			return server.getPlayerPos(self.properties.peer_id)
 		end,
 
-		setAdmin = function(self, give)
+		set_admin = function(self, give)
 			if give then
 				server.addAdmin(self.properties.peer_id)
 			else
@@ -1975,7 +1977,7 @@ cuhFramework.backend.givePlayerData = function(steam_id, name, peer_id, is_admin
 			end
 		end,
 
-		setAuth = function(self, give)
+		set_auth = function(self, give)
 			if give then
 				server.addAuth(self.properties.peer_id)
 			else
@@ -1983,17 +1985,17 @@ cuhFramework.backend.givePlayerData = function(steam_id, name, peer_id, is_admin
 			end
 		end,
 
-		giveItem = function(self, slot, item, int, float, active)
+		give_item = function(self, slot, item, int, float, active)
 			local char_id = server.getPlayerCharacterID(self.properties.peer_id)
 			return server.setCharacterItem(char_id, slot, item, active, int, float)
 		end,
 
-		removeItem = function(self, slot)
+		remove_item = function(self, slot)
 			local char_id = server.getPlayerCharacterID(self.properties.peer_id)
 			return server.setCharacterItem(char_id, slot, 0, false, 0, 0)
 		end,
 
-		hasItem = function(self, slot)
+		has_item = function(self, slot)
 			local char_id = server.getPlayerCharacterID(self.properties.peer_id)
 			return server.getCharacterItem(char_id, slot) ~= 0
 		end,
@@ -2013,6 +2015,20 @@ cuhFramework.backend.givePlayerData = function(steam_id, name, peer_id, is_admin
 			end
 
 			server.setCharacterData(char_id, data.hp - amount, data.interactible, data.ai)
+		end,
+
+		get_character = function(self)
+			return server.getPlayerCharacterID(self.properties.peer_id)
+		end,
+
+		seat = function(self, vehicle, seat_name)
+			local char_id, success = self:get_character()
+
+			if not success then
+				return
+			end
+
+			return server.setCharacterSeated(char_id, vehicle.properties.vehicle_id, seat_name)
 		end
 	}
 
@@ -2499,7 +2515,7 @@ cuhFramework.characters.spawnCharacter = function(position, outfit_id)
 
 		get_data = function(self)
 			return server.getObjectData(self.properties.object_id)
-		end
+		end,
 	}
 
 	return cuhFramework.characters.spawnedCharacters[object_id]
@@ -3017,6 +3033,10 @@ end
 ---@field set_tooltip function<vehicle, string> Sets the tooltip of this vehicle
 ---@field set_invulnerability function<vehicle, boolean> Sets the invulnerability of this vehicle to whatever you specify (true = this vehicle can receive no damage, false = this vehicle can receive damage)
 ---@field repair function<vehicle> Repairs the vehicle. Clears all damage and refills inventories by completely respawning the vehicle at its current position
+---@field set_keypad function<vehicle, string, number> Sets the value of a keypad on this vehicle to the specified value
+---@field get_dial function<vehicle, string> Returns dial data of the specified dial on this vehicle
+---@field press_button function<vehicle, string> Presses the specified button on this vehicle
+---@field get_button function<vehicle, string> Returns button data of the specified button on this vehicle
 
 ------------------------
 ------Vehicles
@@ -3078,6 +3098,22 @@ cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_i
 
 		repair = function(self)
 			return server.resetVehicleState(self.properties.vehicle_id)
+		end,
+
+		set_keypad = function(self, keypad_name, value)
+			return server.setVehicleKeypad(self.properties.vehicle_id, keypad_name, value)
+		end,
+
+		get_dial = function(self, dial_name)
+			return server.getVehicleDial(self.properties.vehicle_id, dial_name)
+		end,
+
+		press_button = function(self, button_name)
+			return server.pressVehicleButton(self.properties.vehicle_id, button_name)
+		end,
+
+		get_button = function(self, button_name)
+			return server.getVehicleButton(self.properties.vehicle_id, button_name)
 		end
 	}
 
