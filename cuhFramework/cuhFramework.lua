@@ -1637,8 +1637,8 @@ cuhFramework.savedata.saved_data = g_savedata
 
 ---Save a value to save data. Functions cannot be saved
 ---@param value any The value to save. Cannot be a function
----@param index any The index of the value. If nil, none will be used. Example (if nil): {value1, value}. Example (if not nil): {index_here = value1, index_here = value}. Cannot be a function. The index is also converted to a string
----@param key string|nil The key to give the value, can be nil if the value doesn't have a key. This is useless if index is nil
+---@param index any|nil The index of the value. If nil, none will be used. Example (if nil): {value1, value}. Example (if not nil): {index_here = value1, index_here = value}. Cannot be a function. The index is also converted to a string
+---@param key any|nil The key to give the value, can be nil if the value doesn't have a key. This is useless if index is nil. Gets converted to a string within this function
 ---@return nil
 cuhFramework.savedata.add = function(value, index, key)
 	key = tostring(key)
@@ -1657,8 +1657,8 @@ end
 
 ---Remove a value from save data
 ---@param value any The value to remove. Cannot be a function
----@param index any The index to use when searching for the value to remove (instead of looping through the values, it returns parent[index]). If nil, this function will just loop through the values to find and remove the passed value
----@param key string|nil The key of the value, can be nil if the value doesn't have a key. This is useless if index is nil
+---@param index any|nil The index to use when searching for the value to remove (instead of looping through the values, it returns parent[index]). If nil, this function will just loop through the values to find and remove the passed value
+---@param key any|nil The key of the value, can be nil if the value doesn't have a key. This is useless if index is nil. Gets converted to a string within this function
 ---@return nil
 cuhFramework.savedata.remove = function(value, index, key)
 	key = tostring(key)
@@ -1677,8 +1677,8 @@ end
 
 ---Get a value from save data
 ---@param value any The value to find
----@param index any The index to use when searching (instead of looping through the values, it returns parent[index]). If nil, this function will just loop through the values to find the desired value
----@param key string|nil The key of the value, can be nil if the value doesn't have a key. This is useless if index is nil
+---@param index any|nil The index to use when searching (instead of looping through the values, it returns parent[index]). If nil, this function will just loop through the values to find the desired value
+---@param key any|nil The key of the value, can be nil if the value doesn't have a key. This is useless if index is nil. Gets converted to a string within this function
 ---@return any|nil value The retrieved value, or nil if not found
 cuhFramework.savedata.get = function(value, index, key)
 	key = tostring(key)
