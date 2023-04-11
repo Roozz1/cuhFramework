@@ -1645,7 +1645,7 @@ cuhFramework.savedata.add = function(value, index, key)
 	index = tostring(index)
 
 	if index and key then
-		index = key..index
+		index = key.."_"..index
 	end
 
 	if index then
@@ -1665,7 +1665,7 @@ cuhFramework.savedata.remove = function(value, index, key)
 	index = tostring(index)
 
 	if key and index then
-		index = key..index
+		index = key.."_"..index
 	end
 
 	if index then
@@ -1685,7 +1685,7 @@ cuhFramework.savedata.get = function(value, index, key)
 	index = tostring(index)
 
 	if key and index then
-		index = key..index
+		index = key.."_"..index
 	end
 
 	if index then
