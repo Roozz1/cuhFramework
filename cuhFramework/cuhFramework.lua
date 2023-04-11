@@ -1636,7 +1636,7 @@ g_savedata = {}
 cuhFramework.savedata.saved_data = g_savedata
 
 ---Save a value to save data. Functions cannot be saved
----@param parent table|nil The table within savedata to add the value to. If nil, the savedata table itself will be the parent
+---@param parent string|nil The name of the data parent to add the value to. If nil, the savedata table itself will be the parent
 ---@param value any The value to save. Cannot be a function
 ---@param index any The index of the value. If nil, none will be used. Example (if nil): {value1, value}. Example (if not nil): {index_here = value1, index_here = value}. Cannot be a function
 ---@return nil
@@ -1644,7 +1644,7 @@ cuhFramework.savedata.add = function(parent, value, index)
 	local target = g_savedata
 
 	if parent then
-		target = parent
+		target = g_savedata[parent]
 	end
 
 	if index then
@@ -1654,6 +1654,57 @@ cuhFramework.savedata.add = function(parent, value, index)
 	end
 end
 
+---Remove a value from save data
+---@param parent table|nil The table within savedata to remove the value from. If nil, the savedata table itself will be the parent
+---@param value any The value to remove. Cannot be a function
+---@param index any The index to use when searching for the value to remove (instead of looping through the values, it returns parent[index]). If nil, this function will just loop through the values to find and remove the passed value
+---@return nil
+cuhFramework.savedata.remove = function(parent, value, index)
+	local target = g_savedata
+
+	if parent then
+		target = g_savedata[parent]
+	end
+
+	if index then
+		target[index] = nil
+	else
+		cuhFramework.utilities.table.removeValueFromTable(target, value)
+	end
+end
+
+---Get a value from save data
+---@param parent table|nil The table within savedata to get the value from. If nil, the savedata table itself will be the parent that the function looks through
+---@param value any The value to find
+---@param index any The index to use when searching (instead of looping through the values, it returns parent[index]). If nil, this function will just loop through the values to find the desired value
+---@return any|nil value The retrieved value, or nil if not found
+cuhFramework.savedata.get = function(parent, value, index)
+	local target = g_savedata
+
+	if parent then
+		target = g_savedata[parent]
+	end
+
+	if index then
+		return target[index]
+	else
+		return cuhFramework.utilities.table.getValueInTable(target, value)
+	end
+end
+
+------------------------
+------Misc
+------------------------
+---Save the game, only works in dedicated servers. Pretty much an alias to server.save()
+---@param save_name string|nil The name of the save. If nil, autosave will be used (I think)
+---@return nil
+cuhFramework.savedata.save = function(save_name)
+	return server.save(save_name)
+end
+
+------------------------
+------Parents
+------------------------
 ---Whether or not a save data parent (table within g_savedata that stores data, think subfolders in a folder) exists
 ---@param name string The name of the parent
 ---@return boolean exists Whether or not the parent exists
@@ -1682,60 +1733,6 @@ end
 cuhFramework.savedata.removeParent = function(name)
 	if cuhFramework.savedata.parentExists(name) then
 		g_savedata[name] = nil
-	end
-end
-
----Get a parent by its name
----@param name string The name of the parent
----@return table|nil parent The parent, or nil if it doesn't exist
-cuhFramework.savedata.getParent = function(name)
-	if cuhFramework.savedata.parentExists(name) then
-		return g_savedata[name]
-	end
-end
-
----Remove a value from save data
----@param parent table|nil The table within savedata to remove the value from. If nil, the savedata table itself will be the parent
----@param value any The value to remove. Cannot be a function
----@param index any The index to use when searching for the value to remove (instead of looping through the values, it returns parent[index]). If nil, this function will just loop through the values to find and remove the passed value
----@return nil
-cuhFramework.savedata.remove = function(parent, value, index)
-	local target = g_savedata
-
-	if parent then
-		target = parent
-	end
-
-	if index then
-		target[index] = nil
-	else
-		cuhFramework.utilities.table.removeValueFromTable(target, value)
-	end
-end
-
----Save the game, only works in dedicated servers. Pretty much an alias to server.save()
----@param save_name string|nil The name of the save. If nil, autosave will be used (I think)
----@return nil
-cuhFramework.savedata.save = function(save_name)
-	return server.save(save_name)
-end
-
----Get a value from save data
----@param parent table|nil The table within savedata to get the value from. If nil, the savedata table itself will be the parent that the function looks through
----@param value any The value to find
----@param index any The index to use when searching (instead of looping through the values, it returns parent[index]). If nil, this function will just loop through the values to find the desired value
----@return any|nil value The retrieved value, or nil if not found
-cuhFramework.savedata.get = function(parent, value, index)
-	local target = g_savedata
-
-	if parent then
-		target = parent
-	end
-
-	if index then
-		return target[index]
-	else
-		return cuhFramework.utilities.table.getValueInTable(target, value)
 	end
 end
 
