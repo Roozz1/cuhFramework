@@ -1657,7 +1657,7 @@ end
 
 ---Remove a value from save data
 ---@param value any The value to remove. Cannot be a function
----@param index any|nil The index to use when searching for the value to remove (instead of looping through the values, it returns parent[index]). If nil, this function will just loop through the values to find and remove the passed value
+---@param index any|nil The index to use when searching for the value to remove (instead of looping through the values, it removes parent[index]). If nil, this function will just loop through the values to find and remove the passed value
 ---@param key any|nil The key of the value, can be nil if the value doesn't have a key. This is useless if index is nil. Gets converted to a string within this function
 ---@return nil
 cuhFramework.savedata.remove = function(value, index, key)
