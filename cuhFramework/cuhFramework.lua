@@ -1641,10 +1641,15 @@ cuhFramework.savedata.saved_data = g_savedata
 ---@param key any|nil The key to give the value, can be nil if the value doesn't have a key. This is useless if index is nil. Gets converted to a string within this function
 ---@return nil
 cuhFramework.savedata.add = function(value, index, key)
-	key = tostring(key)
-	index = tostring(index)
+	if key then
+		key = tostring(key)
+	end
 
-	if index and key then
+	if index then
+		index = tostring(index)
+	end
+
+	if key and index then
 		index = key.."_"..index
 	end
 
@@ -1661,8 +1666,13 @@ end
 ---@param key any|nil The key of the value, can be nil if the value doesn't have a key. This is useless if index is nil. Gets converted to a string within this function
 ---@return nil
 cuhFramework.savedata.remove = function(value, index, key)
-	key = tostring(key)
-	index = tostring(index)
+	if key then
+		key = tostring(key)
+	end
+
+	if index then
+		index = tostring(index)
+	end
 
 	if key and index then
 		index = key.."_"..index
@@ -1681,8 +1691,13 @@ end
 ---@param key any|nil The key of the value, can be nil if the value doesn't have a key. This is useless if index is nil. Gets converted to a string within this function
 ---@return any|nil value The retrieved value, or nil if not found
 cuhFramework.savedata.get = function(value, index, key)
-	key = tostring(key)
-	index = tostring(index)
+	if key then
+		key = tostring(key)
+	end
+
+	if index then
+		index = tostring(index)
+	end
 
 	if key and index then
 		index = key.."_"..index
