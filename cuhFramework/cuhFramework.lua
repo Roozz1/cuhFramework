@@ -1654,6 +1654,46 @@ cuhFramework.savedata.add = function(parent, value, index)
 	end
 end
 
+---Whether or not a save data parent (table within g_savedata that stores data, think subfolders in a folder) exists
+---@param name string The name of the parent
+---@return boolean exists Whether or not the parent exists
+cuhFramework.savedata.parentExists = function(name)
+	if g_savedata[name] then
+		if type(g_savedata[name]) == "table" then
+			return true
+		end
+	end
+
+	return false
+end
+
+---Create a parent
+---@param name string The name of the parent
+---@return nil
+cuhFramework.savedata.createParent = function(name)
+	if not cuhFramework.savedata.parentExists(name) then
+		g_savedata[name] = {}
+	end
+end
+
+---Remove a parent by its name
+---@param name string The name of the parent
+---@return nil
+cuhFramework.savedata.removeParent = function(name)
+	if cuhFramework.savedata.parentExists(name) then
+		g_savedata[name] = nil
+	end
+end
+
+---Get a parent by its name
+---@param name string The name of the parent
+---@return table|nil parent The parent, or nil if it doesn't exist
+cuhFramework.savedata.getParent = function(name)
+	if cuhFramework.savedata.parentExists(name) then
+		return g_savedata[name]
+	end
+end
+
 ---Remove a value from save data
 ---@param parent table|nil The table within savedata to remove the value from. If nil, the savedata table itself will be the parent
 ---@param value any The value to remove. Cannot be a function
