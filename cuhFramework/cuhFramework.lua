@@ -2200,6 +2200,42 @@ cuhFramework.http.ok = function(response)
 	return response ~= ("Connection closed unexpectedly" and "connect(): Connection refused")
 end
 
+---URL encode a string
+---@param input string The string to encode
+---@return string encoded_string The URL encoded string
+cuhFramework.http.url_encode = function(input)
+    if type(input) == "string" then
+        input = string.gsub(input, "\n", "\r\n")
+        input = string.gsub(input, "([^%w ])",
+            function (c)
+				return string.format("%%%02X", string.byte(c))
+			end
+		)
+
+		input = string.gsub(input, " ", "+")
+    end
+
+    return input
+end
+
+---URL decode a string
+---@param input string The string to decode
+---@return string decoded_string The decoded string
+cuhFramework.http.url_decode = function(input)
+    if type(input) == "string" then
+        input = string.gsub(input, "+", " ")
+        input = string.gsub(input, "%%(%x%x)",
+            function (hex)
+				return string.char(tonumber(hex, 16))
+			end
+		)
+
+        input = string.gsub(input, "\r\n", "\n")
+    end
+
+    return input
+end
+
 ---Manage requests
 cuhFramework.callbacks.httpReply:connect(function(port, url, response)
 	for i, v in pairs(cuhFramework.http.requests) do
