@@ -1922,11 +1922,11 @@ end
 ---@field teleport function<player, SWMatrix> Teleport this player to a position
 ---@field fake_chat function<player, string, player|nil> Send a fake message that seems like this player sent it
 ---@field get_position function<player, nil> Returns the position of this player as a matrix
----@field setAdmin function<player, boolean> Gives this player admin/Removes it
----@field setAuth function<player, boolean> Gives this player auth/Removes it
----@field giveItem function<player, SWSlotNumberEnum, SWEquipmentTypeEnum, integer, float, boolean|nil> Gives this player an item
----@field removeItem function<player, SWSlotNumberEnum> Removes an item in the specified slot from this player
----@field hasItem function<player, SWSlotNumberEnum> Whether or not this player has an item in a slot
+---@field set_admin function<player, boolean> Gives this player admin/Removes it
+---@field set_auth function<player, boolean> Gives this player auth/Removes it
+---@field give_item function<player, SWSlotNumberEnum, SWEquipmentTypeEnum, integer, float, boolean|nil> Gives this player an item
+---@field remove_item function<player, SWSlotNumberEnum> Removes an item in the specified slot from this player
+---@field has_item function<player, SWSlotNumberEnum> Whether or not this player has an item in a slot
 ---@field damage function<player, number> Apply damage to a player, pass a negative number to heal
 ---@field get_character function<player> Returns the object ID of this player's character
 ---@field seat function<player, vehicle, seat_name> Places this player in a seat
@@ -2039,7 +2039,7 @@ cuhFramework.callbacks.onPlayerJoin:connect(function(steam_id, name, peer_id, is
 	cuhFramework.backend.givePlayerData(steam_id, name, peer_id, is_admin, is_auth)
 
 	-- and show running ui (extremely useful)
-	cuhFramework.utilities.delay.create(0.05, function()
+	cuhFramework.utilities.delay.create(0.01, function()
 		for i, v in pairs(cuhFramework.ui.screen.activeUI) do
 			if not v.properties.player then
 				server.setPopupScreen(peer_id, v.properties.id, "", v.properties.visible, v.properties.text, v.properties.x, v.properties.y)
@@ -2051,14 +2051,17 @@ end)
 for i, v in pairs(server.getPlayers()) do
 	cuhFramework.backend.givePlayerData(v.steam_id, v.name, v.id, v.admin, v.auth)
 
-	for _, connection in pairs(cuhFramework.callbacks.onPlayerJoin.connections) do
-		connection(v.steam_id, v.name, v.id, v.admin, v.auth)
-	end
+	cuhFramework.utilities.delay.create(0.02, function()
+		for _, connection in pairs(cuhFramework.callbacks.onPlayerJoin.connections) do
+			connection(v.steam_id, v.name, v.id, v.admin, v.auth)
+		end
 
-	local char_id = server.getPlayerCharacterID(v.id)
-	for _, connection in pairs(cuhFramework.callbacks.onObjectLoad.connections) do
-		connection(char_id)
-	end
+		local char_id = server.getPlayerCharacterID(v.id)
+
+		for _, connection in pairs(cuhFramework.callbacks.onObjectLoad.connections) do
+			connection(char_id)
+		end
+	end)
 end
 
 cuhFramework.callbacks.onPlayerLeave:connect(function(steam_id, name, peer_id, is_admin, is_auth)
