@@ -2153,7 +2153,7 @@ end
 ---@class http_get_request
 ---@field port integer The port of the request
 ---@field url string The URL of the request (eg: "/my_thingy". you can only send a rqeuest ot localhost)
----@field callback function The function that will be called when this request receives a reply
+---@field callback function|nil The function that will be called when this request receives a reply
 ---@field id integer The ID of the request data
 
 ------------------------
@@ -2165,7 +2165,7 @@ cuhFramework.http.requests = {}
 ---Send a get request
 ---@param url string The URL to send the request to (example: "/my_thingy"). You cannot send a request to anywhere but localhost because Stormworks is silly like that
 ---@param port integer The port of the request
----@param reply_callback function The function that will be called when a reply is received. An argument is passed through to this function, the response of the request
+---@param reply_callback function|nil The function that will be called when a reply is received. An argument is passed through to this function, the response of the request
 cuhFramework.http.get = function(url, port, reply_callback)
 	local id = #cuhFramework.http.requests + 1
 	cuhFramework.http.requests[id] = {
@@ -2239,7 +2239,7 @@ end
 ---Manage requests
 cuhFramework.callbacks.httpReply:connect(function(port, url, response)
 	for i, v in pairs(cuhFramework.http.requests) do
-		if v.port == port and v.url == url then
+		if v.port == port and v.url == url and v.callback then
 			v.callback(response)
 		end
 	end
