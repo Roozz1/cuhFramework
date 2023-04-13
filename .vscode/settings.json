@@ -57,5 +57,6 @@
             "name": "LifeBoatAPI",
             "gitUrl": "https://github.com/nameouschangey/Stormworks_LifeBoatAPI_Addon.git"
         }
-    ]
+    ],
+    "discord.enabled": false
 }
