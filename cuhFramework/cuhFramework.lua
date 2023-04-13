@@ -2690,19 +2690,7 @@ end
 ---Remove a screen UI object
 ---@param id integer The ID of the UI object
 cuhFramework.ui.screen.remove = function(id)
-	local uiObject = cuhFramework.ui.screen.activeUI[id]
-
-	if not uiObject then
-		cuhFramework.references.removePopup(-1, id)
-		return
-	end
-
-	if uiObject.properties.player then
-		cuhFramework.references.removePopup(uiObject.properties.player.peer_id, id)
-	else
-		cuhFramework.references.removePopup(-1, id)
-	end
-
+	cuhFramework.references.removePopup(-1, id)
 	cuhFramework.ui.screen.activeUI[id] = nil
 end
 
