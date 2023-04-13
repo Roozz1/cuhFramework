@@ -2178,6 +2178,8 @@ cuhFramework.http.get = function(url, port, reply_callback)
 		id = id
 	}
 
+	cuhFramework.references.httpGet(port, url)
+
 	return {
 		properties = cuhFramework.http.requests[id],
 
@@ -2349,7 +2351,7 @@ cuhFramework.objects.spawnObject = function(position, object_type)
 		end,
 
 		explode = function(self, magnitude)
-			server.spawnExplosion(self:get_position(), magnitude or 0.1)
+			cuhFramework.references.explode(self:get_position(), magnitude or 0.1)
 			return self:despawn()
 		end
 	}
@@ -2467,7 +2469,7 @@ cuhFramework.creatures.spawnCreature = function(position, creature_type, size_mu
 		end,
 
 		explode = function(self, magnitude)
-			server.spawnExplosion(self:get_position(), magnitude or 0.1)
+			cuhFramework.references.explode(self:get_position(), magnitude or 0.1)
 			return self:despawn()
 		end
 	}
@@ -2570,7 +2572,7 @@ cuhFramework.characters.spawnCharacter = function(position, outfit_id)
 		end,
 
 		explode = function(self, magnitude)
-			server.spawnExplosion(self:get_position(), magnitude or 0.1)
+			cuhFramework.references.explode(self:get_position(), magnitude or 0.1)
 			return self:despawn()
 		end
 	}
