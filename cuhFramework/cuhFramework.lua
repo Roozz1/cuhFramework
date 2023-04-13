@@ -2306,6 +2306,7 @@ end
 ---@field teleport function<object, SWMatrix> Teleport this object
 ---@field get_position function<object> Get the position of this object
 ---@field get_data function<object> Returns the raw data of this object provided by Stormworks
+---@field explode function<object, number|nil> Explodes this object, while also despawning this object
 
 ------------------------
 ------Objects
@@ -2345,6 +2346,11 @@ cuhFramework.objects.spawnObject = function(position, object_type)
 
 		get_data = function(self)
 			return server.getObjectData(self.properties.object_id)
+		end,
+
+		explode = function(self, magnitude)
+			server.spawnExplosion(self:get_position(), magnitude or 0.1)
+			return self:despawn()
 		end
 	}
 
@@ -2397,6 +2403,7 @@ end
 ---@field damage function<creature, number> Damage this creature, negative number = heal
 ---@field set_move_target function<creature, SWMatrix> Make the creature walk to this position
 ---@field get_data function<creature> Returns the raw data of this creature provided by Stormworks
+---@field explode function<creature, number|nil> Explodes this creature, while also despawning this creature
 
 ------------------------
 ------Creatures
@@ -2457,6 +2464,11 @@ cuhFramework.creatures.spawnCreature = function(position, creature_type, size_mu
 
 		get_data = function(self)
 			return server.getObjectData(self.properties.object_id)
+		end,
+
+		explode = function(self, magnitude)
+			server.spawnExplosion(self:get_position(), magnitude or 0.1)
+			return self:despawn()
 		end
 	}
 
@@ -2500,6 +2512,7 @@ end
 ---@field get_position function<character> Get the position of this character
 ---@field damage function<character, number> Damage this character, negative number = heal
 ---@field get_data function<character> Returns the raw data of this character provided by Stormworks
+---@field explode function<character, number|nil> Explodes this character, while also despawning this character
 
 ------------------------
 ------Characters
@@ -2555,6 +2568,11 @@ cuhFramework.characters.spawnCharacter = function(position, outfit_id)
 		get_data = function(self)
 			return server.getObjectData(self.properties.object_id)
 		end,
+
+		explode = function(self, magnitude)
+			server.spawnExplosion(self:get_position(), magnitude or 0.1)
+			return self:despawn()
+		end
 	}
 
 	return cuhFramework.characters.spawnedCharacters[object_id]
