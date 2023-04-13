@@ -3100,6 +3100,7 @@ end
 ---@field get_dial function<vehicle, string> Returns dial data of the specified dial on this vehicle
 ---@field press_button function<vehicle, string> Presses the specified button on this vehicle
 ---@field get_button function<vehicle, string> Returns button data of the specified button on this vehicle
+---@field set_editable function<vehicle, boolean> Sets whether this vehicle is editable or not
 
 ------------------------
 ------Vehicles
@@ -3177,6 +3178,10 @@ cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_i
 
 		get_button = function(self, button_name)
 			return server.getVehicleButton(self.properties.vehicle_id, button_name)
+		end,
+
+		set_editable = function(self, state)
+			return server.setVehicleEditable(self.properties.vehicle_id, state)
 		end
 	}
 
