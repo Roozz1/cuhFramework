@@ -2246,6 +2246,7 @@ cuhFramework.callbacks.httpReply:connect(function(port, url, response)
 	for i, v in pairs(cuhFramework.http.requests) do
 		if v.port == port and v.url == url and v.callback then
 			v.callback(response)
+			cuhFramework.http.requests[i] = nil
 		end
 	end
 end)
