@@ -2333,7 +2333,7 @@ cuhFramework.objects.spawnedObjects = {}
 ---Spawn a object
 ---@param position SWMatrix The position to spawn this object at
 ---@param object_type SWObjectTypeEnum The type of object to spawn
----@return object|nil object The object, or nil if failed to spawn
+---@return object object The object, or nil if failed to spawn
 cuhFramework.objects.spawnObject = function(position, object_type)
 	local object_id, success = server.spawnObject(position, object_type)
 
@@ -2375,7 +2375,7 @@ end
 
 ---Get object by object ID
 ---@param object_id integer The object ID of the object
----@return object|nil object The object, or nil if no object found
+---@return object object The object, or nil if no object found
 cuhFramework.objects.getObjectByObjectId = function(object_id)
 	return cuhFramework.objects.spawnedObjects[object_id]
 end
@@ -2431,7 +2431,7 @@ cuhFramework.creatures.spawnedCreatures = {}
 ---@param position SWMatrix The position to spawn this creature at
 ---@param creature_type SWCreatureTypeEnum The type of creature
 ---@param size_multiplier number The size multiplier of this creature
----@return creature|nil creature The creature, or nil if failed to spawn
+---@return creature creature The creature, or nil if failed to spawn
 cuhFramework.creatures.spawnCreature = function(position, creature_type, size_multiplier)
 	local object_id, success = server.spawnCreature(position, creature_type, size_multiplier)
 
@@ -2493,7 +2493,7 @@ end
 
 ---Get creature by object ID
 ---@param object_id integer The object ID of the creature
----@return creature|nil creature The creature, or nil if no creature found
+---@return creature creature The creature, or nil if no creature found
 cuhFramework.creatures.getCreatureByObjectId = function(object_id)
 	return cuhFramework.creatures.spawnedCreatures[object_id]
 end
@@ -2539,7 +2539,7 @@ cuhFramework.characters.spawnedCharacters = {}
 ---Spawn a character
 ---@param position SWMatrix The position to spawn this character at
 ---@param outfit_id SWOutfitTypeEnum The character outfit the character should spawn with
----@return character|nil character The character, or nil if failed to spawn
+---@return character character The character, or nil if failed to spawn
 cuhFramework.characters.spawnCharacter = function(position, outfit_id)
 	local object_id, success = server.spawnCharacter(position, outfit_id)
 
@@ -2596,7 +2596,7 @@ end
 
 ---Get character by object ID
 ---@param object_id integer The object ID of the character
----@return character|nil character The character, or nil if no character found
+---@return character character The character, or nil if no character found
 cuhFramework.characters.getCharacterByObjectId = function(object_id)
 	return cuhFramework.characters.spawnedCharacters[object_id]
 end
@@ -3229,7 +3229,7 @@ end
 
 ---Get a vehicle by its vehicle ID
 ---@param vehicle_id integer Vehicle ID of the vehicle you want to retrieve
----@return vehicle|nil vehicle The retrieved vehicle
+---@return vehicle vehicle The retrieved vehicle
 cuhFramework.vehicles.getVehicleByVehicleId = function(vehicle_id)
 	return cuhFramework.vehicles.spawnedVehicles[vehicle_id]
 end
