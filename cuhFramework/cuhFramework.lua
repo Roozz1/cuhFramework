@@ -2660,28 +2660,30 @@ cuhFramework.ui.screen.create = function(id, text, x, y, player)
 				self.properties.player = nil
 			end
 
-			self:setVisibility(self.properties.visible) -- refresh ui
+			self:refresh()
 		end,
 
 		setVisibility = function(self, shouldShow)
+			if self.properties.visible == shouldShow then
+				return
+			end
+
+			self.properties.visible = shouldShow
+			self:refresh()
+		end,
+
+		refresh = function(self)
 			local v_peer_id = -1
 
 			if self.properties.player then
 				v_peer_id = self.properties.player.properties.peer_id
 			end
 
-			cuhFramework.references.createScreenPopup(v_peer_id, self.properties.id, "", shouldShow, self.properties.text, self.properties.x, self.properties.y)
-			self.properties.visible = shouldShow
+			cuhFramework.references.createScreenPopup(v_peer_id, self.properties.id, "", self.properties.visible, self.properties.text, self.properties.x, self.properties.y)
 		end
 	}
 
-	local peer_id = -1
-
-	if player then
-		peer_id = player.properties.peer_id
-	end
-
-	cuhFramework.references.createScreenPopup(peer_id, id, "", true, text, x, y)
+	cuhFramework.ui.screen.activeUI[id]:refresh()
 	return cuhFramework.ui.screen.activeUI[id]
 end
 
