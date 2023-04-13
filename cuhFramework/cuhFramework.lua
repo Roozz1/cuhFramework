@@ -2200,7 +2200,7 @@ end
 ---@param response boolean The response of the request
 ---@return boolean ok Whether or not the request was successful
 cuhFramework.http.ok = function(response)
-	return response ~= ("Connection closed unexpectedly" and "connect(): Connection refused")
+	return response ~= ("Connection closed unexpectedly" and "connect(): Connection refused" and "recv(): Connection reset by peer")
 end
 
 ---URL encode a string
