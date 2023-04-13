@@ -2125,7 +2125,7 @@ cuhFramework.players.getPlayerByObjectId = function(object_id)
 	end
 end
 
----Get a player by their Steam ID
+---Get a player by their name
 ---@param name string Name of the player
 ---@param caps_sensitive boolean Whether or not the search should be caps sensitive
 ---@return player player The retrieved player, or nil if no player found
@@ -2137,6 +2137,24 @@ cuhFramework.players.getPlayerByName = function(name, caps_sensitive)
 			end
 		else
 			if v.properties.name == name then
+				return v
+			end
+		end
+	end
+end
+
+---Get a player by their name, but a partial name is allowed
+---@param name string Name/Partial name of the player
+---@param caps_sensitive boolean Whether or not the search should be caps sensitive
+---@return player player The retrieved player, or nil if no player found
+cuhFramework.players.getPlayerByName = function(name, caps_sensitive)
+	for i, v in pairs(cuhFramework.players.connectedPlayers) do
+		if caps_sensitive then
+			if v.properties.name:lower():gsub(" ", ""):find(name:lower():gsub(" ", "")) then
+				return v
+			end
+		else
+			if v.properties.name:gsub(" ", ""):find(name:gsub(" ", "")) then
 				return v
 			end
 		end
@@ -3145,13 +3163,8 @@ cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_i
 		end,
 
 		explode = function(self, magnitude)
-			local vehicle_pos, success = self:get_position()
-
-			if success then
-				cuhFramework.references.explode(vehicle_pos, magnitude or 0.1)
-			end
-
-			self:despawn()
+			cuhFramework.references.explode(self:get_position(), magnitude or 0.1)
+			return self:despawn()
 		end,
 
 		get_position = function(self, voxel_x, voxel_y, voxel_z)
