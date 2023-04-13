@@ -1320,12 +1320,23 @@ end
 
 ---Get the closest player to a position
 ---@param position SWMatrix The position to check
+---@param exceptions table<any, player>|nil A table containing players to ignore
 ---@return player|nil
-cuhFramework.utilities.miscellaneous.getClosestPlayerToPosition = function(position)
+cuhFramework.utilities.miscellaneous.getClosestPlayerToPosition = function(position, exceptions)
 	local recentPlayer = nil
 	local recentDistance = -1
 
+	local list = {}
+
+	for i, v in pairs(exceptions) do
+		list[v.properties.peer_id] = true
+	end
+
 	for i, v in pairs(cuhFramework.players.connectedPlayers) do
+		if list[v.properties.peer_id] then
+			goto continue
+		end
+
 		local player_position = v:get_position()
 		local distance = cuhFramework.references.matrix.distance(player_position, position)
 
@@ -1333,6 +1344,8 @@ cuhFramework.utilities.miscellaneous.getClosestPlayerToPosition = function(posit
 			recentDistance = distance
 			recentPlayer = v
 		end
+
+	    ::continue::
 	end
 
 	return recentPlayer
