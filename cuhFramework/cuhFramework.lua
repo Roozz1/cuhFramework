@@ -2143,11 +2143,11 @@ cuhFramework.players.getPlayerByName = function(name, caps_sensitive)
 	end
 end
 
----Get a player by their name, but a partial name is allowed
+---Get a player by their name, but a partial name is allowed (award for best function name goes to me)
 ---@param name string Name/Partial name of the player
 ---@param caps_sensitive boolean Whether or not the search should be caps sensitive
 ---@return player player The retrieved player, or nil if no player found
-cuhFramework.players.getPlayerByName = function(name, caps_sensitive)
+cuhFramework.players.getPlayerByNameWithAllowedPartialName = function(name, caps_sensitive)
 	for i, v in pairs(cuhFramework.players.connectedPlayers) do
 		if caps_sensitive then
 			if v.properties.name:lower():gsub(" ", ""):find(name:lower():gsub(" ", "")) then
