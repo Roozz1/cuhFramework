@@ -1328,8 +1328,10 @@ cuhFramework.utilities.miscellaneous.getClosestPlayerToPosition = function(posit
 
 	local list = {}
 
-	for i, v in pairs(exceptions) do
-		list[v.properties.peer_id] = true
+	if exceptions then
+		for i, v in pairs(exceptions) do
+			list[v.properties.peer_id] = true
+		end
 	end
 
 	for i, v in pairs(cuhFramework.players.connectedPlayers) do
@@ -1939,7 +1941,7 @@ end
 ---@field set_auth function<player, boolean> Gives this player auth/Removes it
 ---@field give_item function<player, SWSlotNumberEnum, SWEquipmentTypeEnum, integer, float, boolean|nil> Gives this player an item
 ---@field remove_item function<player, SWSlotNumberEnum> Removes an item in the specified slot from this player
----@field has_item function<player, SWSlotNumberEnum> Whether or not this player has an item in a slot
+---@field get_item function<player, SWSlotNumberEnum> Return the item in the specified slot
 ---@field damage function<player, number> Apply damage to a player, pass a negative number to heal
 ---@field get_character function<player> Returns the object ID of this player's character
 ---@field seat function<player, vehicle, seat_name> Places this player in a seat
@@ -1979,7 +1981,8 @@ cuhFramework.backend.givePlayerData = function(steam_id, name, peer_id, is_admin
 		end,
 
 		get_position = function(self)
-			return server.getPlayerPos(self.properties.peer_id)
+			local pos = server.getPlayerPos(self.properties.peer_id)
+			return pos
 		end,
 
 		set_admin = function(self, give)
@@ -2008,9 +2011,9 @@ cuhFramework.backend.givePlayerData = function(steam_id, name, peer_id, is_admin
 			return server.setCharacterItem(char_id, slot, 0, false, 0, 0)
 		end,
 
-		has_item = function(self, slot)
+		get_item = function(self, slot)
 			local char_id = server.getPlayerCharacterID(self.properties.peer_id)
-			return server.getCharacterItem(char_id, slot) ~= 0
+			return server.getCharacterItem(char_id, slot)
 		end,
 
 		kill = function(self)
@@ -2357,7 +2360,8 @@ cuhFramework.objects.spawnObject = function(position, object_type)
 		end,
 
 		get_position = function(self)
-			return server.getObjectPos(self.properties.object_id)
+			local pos = server.getObjectPos(self.properties.object_id)
+			return pos
 		end,
 
 		get_data = function(self)
@@ -2460,7 +2464,8 @@ cuhFramework.creatures.spawnCreature = function(position, creature_type, size_mu
 		end,
 
 		get_position = function(self)
-			return server.getObjectPos(self.properties.object_id)
+			local pos = server.getObjectPos(self.properties.object_id)
+			return pos
 		end,
 
 		damage = function(self, amount)
@@ -2567,7 +2572,8 @@ cuhFramework.characters.spawnCharacter = function(position, outfit_id)
 		end,
 
 		get_position = function(self)
-			return server.getObjectPos(self.properties.object_id)
+			local pos = server.getObjectPos(self.properties.object_id)
+			return pos
 		end,
 
 		damage = function(self, amount)
@@ -3091,7 +3097,7 @@ end
 ---@field properties vehicleProperties The properties of this vehicle
 ---@field despawn function<vehicle> Despawn this vehicle
 ---@field teleport function<vehicle, SWMatrix> Teleport this vehicle
----@field explode function<vehicle> Explodes this vehicle and despawns it
+---@field explode function<vehicle, number> Explodes this vehicle and despawns it
 ---@field get_position function<vehicle, number?, number?, number?> Get the position of this vehicle. The voxel parameters are optional
 ---@field set_tooltip function<vehicle, string> Sets the tooltip of this vehicle
 ---@field set_invulnerability function<vehicle, boolean> Sets the invulnerability of this vehicle to whatever you specify (true = this vehicle can receive no damage, false = this vehicle can receive damage)
@@ -3138,18 +3144,19 @@ cuhFramework.backend.vehicle_spawn_giveVehicleData = function(vehicle_id, peer_i
 			return server.setVehiclePos(self.properties.vehicle_id, pos)
 		end,
 
-		explode = function(self)
+		explode = function(self, magnitude)
 			local vehicle_pos, success = self:get_position()
 
 			if success then
-				cuhFramework.references.explode(vehicle_pos, 0.1)
+				cuhFramework.references.explode(vehicle_pos, magnitude or 0.1)
 			end
 
 			self:despawn()
 		end,
 
 		get_position = function(self, voxel_x, voxel_y, voxel_z)
-			return server.getVehiclePos(self.properties.vehicle_id, voxel_x, voxel_y, voxel_z)
+			local pos = server.getVehiclePos(self.properties.vehicle_id, voxel_x, voxel_y, voxel_z)
+			return pos
 		end,
 
 		set_tooltip = function(self, text)
@@ -3221,10 +3228,15 @@ end)
 ---Spawn an addon vehicle
 ---@param playlist_id integer The ID of the addon vehicle, this can be found in the playlist.xml file or in the in-game editor
 ---@param position SWMatrix The position to spawn this vehicle at
----@return integer vehicle_id The ID of this vehicle
----@return boolean success Whether or not spawning this vehicle was successful
+---@return vehicle vehicle The vehicle, or nil if failed to spawn
 cuhFramework.vehicles.spawnAddonVehicle = function(playlist_id, position)
-	return server.spawnAddonVehicle(position, (server.getAddonIndex()), playlist_id)
+	local vehicle_id, success = server.spawnAddonVehicle(position, (server.getAddonIndex()), playlist_id)
+
+	if success then
+		cuhFramework.backend.vehicle_spawn_giveVehicleData(vehicle_id, -1, position[13], position[14], position[15])
+	end
+
+	return cuhFramework.vehicles.spawnedVehicles[vehicle_id]
 end
 
 ---Get a vehicle by its vehicle ID
