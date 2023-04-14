@@ -2089,7 +2089,7 @@ cuhFramework.callbacks.onPlayerLeave:connect(function(steam_id, name, peer_id, i
 		end
 	end
 
-	cuhFramework.players.connectedPlayers[peer_id].disconnecting = true
+	cuhFramework.players.connectedPlayers[peer_id].properties.disconnecting = true
 
 	cuhFramework.utilities.delay.create(0.1, function()
 		cuhFramework.players.connectedPlayers[peer_id] = nil
