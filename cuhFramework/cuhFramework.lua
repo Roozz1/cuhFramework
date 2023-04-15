@@ -1936,7 +1936,7 @@ end
 ---@field kill function<player> Kills this player
 ---@field teleport function<player, SWMatrix> Teleport this player to a position
 ---@field fake_chat function<player, string, player|nil> Send a fake message that seems like this player sent it
----@field get_position function<player, nil> Returns the position of this player as a matrix
+---@field get_position function<player> Returns the position of this player as a matrix
 ---@field set_admin function<player, boolean> Gives this player admin/Removes it
 ---@field set_auth function<player, boolean> Gives this player auth/Removes it
 ---@field give_item function<player, SWSlotNumberEnum, SWEquipmentTypeEnum, integer, float, boolean|nil> Gives this player an item
