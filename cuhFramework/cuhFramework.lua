@@ -1054,13 +1054,24 @@ cuhFramework.utilities.string.split = function(str, sep)
 end
 
 ---Converts anything into a string, alias to tostring()
----@param input any|nil String to split
+---@param input any|nil The input to convert to a string
 ---@return string string The tostring()'d version of input
 cuhFramework.utilities.string.tostring = function(input)
 	return tostring(input)
 end
 
----Replaces occurences in a string with something else
+---Converts a string to a bool. "true"/"True"/"TrUe" becomes true. "false"/"False"/"FalSe" becomes false. Anything else becomes nil
+---@param str string The string to convert to a bool
+---@return boolean|nil bool True or false depending on the string. Nil if the string doesn't match true or false
+cuhFramework.utilities.string.tobool = function(str)
+	if input:lower() == "true" then
+		return true
+	elseif input:lower() == "false" then
+		return false
+	end
+end
+
+---Replaces occurences in a string with something else, alias to string.gsub()
 ---@param input string Input string
 ---@param pattern string The pattern to find
 ---@param replacement string What to replace all occurences of the specified pattern with
@@ -1087,6 +1098,19 @@ cuhFramework.utilities.table.isValueInTable = function(tbl, value)
 	end
 
 	return false
+end
+
+---Get the amount of values in a table
+---@param tbl table Table to check
+---@return integer value_count The amount of values in this table
+cuhFramework.utilities.table.getValueCountOfTable = function(tbl)
+	local count = 0
+
+	for _ in pairs(tbl) do
+		count = count + 1
+	end
+
+	return count
 end
 
 ---Remove a value from a table
@@ -2149,7 +2173,7 @@ end
 ---@return player player The retrieved player, or nil if no player found
 cuhFramework.players.getPlayerByNameWithAllowedPartialName = function(name, caps_sensitive)
 	for i, v in pairs(cuhFramework.players.connectedPlayers) do
-		if caps_sensitive then
+		if not caps_sensitive then
 			if v.properties.name:lower():gsub(" ", ""):find(name:lower():gsub(" ", "")) then
 				return v
 			end
@@ -3220,7 +3244,9 @@ cuhFramework.backend.vehicle_load_setVehicleData = function(vehicle_id)
 	end
 
 	vehicle_data.properties.loaded = true
-	vehicle_data.properties.loaded_vehicle_data = server.getVehicleData(vehicle_id)
+
+	local data = server.getVehicleData(vehicle_id)
+	vehicle_data.properties.loaded_vehicle_data = data
 end
 
 cuhFramework.callbacks.onVehicleSpawn:connect(function(vehicle_id, peer_id, x, y, z, cost)
@@ -3228,7 +3254,9 @@ cuhFramework.callbacks.onVehicleSpawn:connect(function(vehicle_id, peer_id, x, y
 end)
 
 cuhFramework.callbacks.onVehicleLoad:connect(function(vehicle_id)
-	cuhFramework.backend.vehicle_load_setVehicleData(vehicle_id)
+	cuhFramework.utilities.delay.create(1, function()
+		cuhFramework.backend.vehicle_load_setVehicleData(vehicle_id)
+	end)
 end)
 
 cuhFramework.callbacks.onVehicleDespawn:connect(function(vehicle_id, peer_id)
