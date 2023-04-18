@@ -49,6 +49,7 @@ cuhFramework = {
 
 	utilities = {},
 	callbacks = {},
+	customCallbacks = {},
 	references = {},
 
 	chat = {},
@@ -1023,6 +1024,66 @@ function onVolcano(...)
 		v(...)
 	end
 end
+
+----------------------------------------
+----------------------------------------
+--//Framework - Custom Callbacks\\--
+----------------------------------------
+----------------------------------------
+cuhFramework.customCallbacks.onVehicleSpawn = {
+	connections = {},
+	---Connect a function to onVehicleSpawn (custom)
+	---@param callback function
+	connect = function(self, callback)
+		local id = #self.connections + 1
+		self.connections[id] = callback
+
+		return {
+			connection_id = id,
+			disconnect = function()
+				self.connections[id] = nil
+			end
+		}
+	end
+}
+
+----------------
+
+cuhFramework.customCallbacks.onVehicleLoad = {
+	connections = {},
+	---Connect a function to onVehicleLoad (custom)
+	---@param callback function
+	connect = function(self, callback)
+		local id = #self.connections + 1
+		self.connections[id] = callback
+
+		return {
+			connection_id = id,
+			disconnect = function()
+				self.connections[id] = nil
+			end
+		}
+	end
+}
+
+----------------
+
+cuhFramework.customCallbacks.onVehicleDespawn = {
+	connections = {},
+	---Connect a function to onVehicleDespawn (custom)
+	---@param callback function
+	connect = function(self, callback)
+		local id = #self.connections + 1
+		self.connections[id] = callback
+
+		return {
+			connection_id = id,
+			disconnect = function()
+				self.connections[id] = nil
+			end
+		}
+	end
+}
 
 ----------------------------------------
 ----------------------------------------
@@ -2124,7 +2185,7 @@ end)
 ---@param peer_id integer Peer ID of the player you want to get
 ---@return player player The retrieved player, or nil if no player found
 cuhFramework.players.getPlayerByPeerId = function(peer_id)
-	return cuhFramework.players.connectedPlayers[peer_id]
+	return cuhFramework.players.connectedPlayers[peer_id] or nil
 end
 
 ---Get a player by their Steam ID
@@ -3245,25 +3306,49 @@ cuhFramework.backend.vehicle_load_setVehicleData = function(vehicle_id)
 
 	vehicle_data.properties.loaded = true
 
-	local data = server.getVehicleData(vehicle_id)
+	local data, success = server.getVehicleData(vehicle_id)
+
+	if not success then
+		return
+	end
+
 	vehicle_data.properties.loaded_vehicle_data = data
 end
 
 cuhFramework.callbacks.onVehicleSpawn:connect(function(vehicle_id, peer_id, x, y, z, cost)
+	if cuhFramework.vehicles.spawnedVehicles[vehicle_id] then -- already has data
+		return
+	end
+
 	cuhFramework.backend.vehicle_spawn_giveVehicleData(vehicle_id, peer_id, x, y, z, cost)
+
+	local vehicle = cuhFramework.vehicles.getVehicleByVehicleId(vehicle_id)
+
+	for i, v in pairs(cuhFramework.customCallbacks.onVehicleSpawn.connections) do
+		v(vehicle)
+	end
 end)
 
 cuhFramework.callbacks.onVehicleLoad:connect(function(vehicle_id)
 	cuhFramework.utilities.delay.create(1, function()
 		cuhFramework.backend.vehicle_load_setVehicleData(vehicle_id)
+
+		local vehicle = cuhFramework.vehicles.getVehicleByVehicleId(vehicle_id)
+
+		for i, v in pairs(cuhFramework.customCallbacks.onVehicleLoad.connections) do
+			v(vehicle)
+		end
 	end)
 end)
 
 cuhFramework.callbacks.onVehicleDespawn:connect(function(vehicle_id, peer_id)
-	cuhFramework.utilities.delay.create(0.1, function()
-		-- cuhFramework.vehicles.despawnVehicle(vehicle_id)
-		cuhFramework.vehicles.spawnedVehicles[vehicle_id] = nil
-	end)
+	local vehicle = cuhFramework.vehicles.getVehicleByVehicleId(vehicle_id)
+
+	for i, v in pairs(cuhFramework.customCallbacks.onVehicleDespawn.connections) do
+		v(vehicle)
+	end
+
+	cuhFramework.vehicles.spawnedVehicles[vehicle_id] = nil
 end)
 
 ---Spawn an addon vehicle
@@ -3277,14 +3362,14 @@ cuhFramework.vehicles.spawnAddonVehicle = function(playlist_id, position)
 		cuhFramework.backend.vehicle_spawn_giveVehicleData(vehicle_id, -1, position[13], position[14], position[15])
 	end
 
-	return cuhFramework.vehicles.spawnedVehicles[vehicle_id]
+	return cuhFramework.vehicles.spawnedVehicles[vehicle_id] or nil
 end
 
 ---Get a vehicle by its vehicle ID
 ---@param vehicle_id integer Vehicle ID of the vehicle you want to retrieve
 ---@return vehicle vehicle The retrieved vehicle
 cuhFramework.vehicles.getVehicleByVehicleId = function(vehicle_id)
-	return cuhFramework.vehicles.spawnedVehicles[vehicle_id]
+	return cuhFramework.vehicles.spawnedVehicles[vehicle_id] or nil
 end
 
 ---Get a list of vehicles owned by a player
