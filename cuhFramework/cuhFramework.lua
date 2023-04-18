@@ -3403,7 +3403,6 @@ end
 ---@param vehicle_id integer The vehicle ID of the vehicle you want to despawn
 cuhFramework.vehicles.despawnVehicle = function(vehicle_id)
 	server.despawnVehicle(vehicle_id, true)
-	cuhFramework.vehicles.spawnedVehicles[vehicle_id] = nil
 end
 
 ----------------------------------------
