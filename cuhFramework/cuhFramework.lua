@@ -70,9 +70,7 @@ cuhFramework = {
 			end,
 
 			exceptions = {}
-		},
-
-		ticks = 0
+		}
 	}
 }
 
@@ -116,8 +114,6 @@ function onTick(...)
 		if type(v) ~= "function" then
 			goto continue
 		end
-
-		cuhFramework.backend.ticks = cuhFramework.backend.ticks + 1
 
 		v(...)
 
@@ -1669,70 +1665,70 @@ cuhFramework.animation.createLinearAnimation = function(start_position, desired_
 	}
 end
 
--- ---Create an exponential animation. Does not support rotation, only XYZ position
--- ---@param start_position SWMatrix The position for the animation to start at
--- ---@param desired_position SWMatrix The position for the animation to end at
--- ---@param speed number The speed of the animation
--- ---@param should_loop boolean Whether or not the animation should repeat upon reaching the desired position
--- ---@param callback function<animation_data> The function that is called every animation tick. One argument is passed through, the animation data
--- cuhFramework.animation.createExponentialAnimation = function(start_position, desired_position, speed, should_loop, callback)
--- 	local id = #cuhFramework.animation.ongoingAnimations + 1
--- 	cuhFramework.animation.ongoingAnimations[id] = {
--- 		start_pos = start_position,
--- 		current_pos = matrix.translation(start_position[13], start_position[14], start_position[15]),
--- 		destination_pos = desired_position,
--- 		paused = false,
--- 		looping = should_loop,
--- 		increment = speed,
--- 		callback = callback,
--- 		id = id,
--- 		finished = false,
--- 		type = "exponential"
--- 	}
+---Create an exponential animation. Does not support rotation, only XYZ position
+---@param start_position SWMatrix The position for the animation to start at
+---@param desired_position SWMatrix The position for the animation to end at
+---@param speed number The speed of the animation
+---@param should_loop boolean Whether or not the animation should repeat upon reaching the desired position
+---@param callback function<animation_data> The function that is called every animation tick. One argument is passed through, the animation data
+cuhFramework.animation.createExponentialAnimation = function(start_position, desired_position, speed, should_loop, callback)
+	local id = #cuhFramework.animation.ongoingAnimations + 1
+	cuhFramework.animation.ongoingAnimations[id] = {
+		start_pos = start_position,
+		current_pos = matrix.translation(start_position[13], start_position[14], start_position[15]),
+		destination_pos = desired_position,
+		paused = false,
+		looping = should_loop,
+		increment = speed,
+		callback = callback,
+		id = id,
+		finished = false,
+		type = "exponential"
+	}
 
--- 	return {
--- 		properties = cuhFramework.animation.ongoingAnimations[id],
+	return {
+		properties = cuhFramework.animation.ongoingAnimations[id],
 
--- 		---Remove the animation
--- 		---@return nil
--- 		remove = function(self)
--- 			return cuhFramework.animation.removeAnimation(self.properties.id)
--- 		end,
+		---Remove the animation
+		---@return nil
+		remove = function(self)
+			return cuhFramework.animation.removeAnimation(self.properties.id)
+		end,
 
--- 		---Pause/unpause the animation
--- 		---@param state boolean true = pause, false = unpause
--- 		---@return nil
--- 		setPaused = function(self, state)
--- 			self.properties.paused = state
--- 		end,
+		---Pause/unpause the animation
+		---@param state boolean true = pause, false = unpause
+		---@return nil
+		setPaused = function(self, state)
+			self.properties.paused = state
+		end,
 
--- 		---Set whether or not the animation loops
--- 		---@param state boolean true = loop, false = don't loop
--- 		---@return nil
--- 		setLooped = function(self, state)
--- 			self.properties.looping = state
--- 		end,
+		---Set whether or not the animation loops
+		---@param state boolean true = loop, false = don't loop
+		---@return nil
+		setLooped = function(self, state)
+			self.properties.looping = state
+		end,
 
--- 		---Whether or not the animation is finished
--- 		---@return boolean finished
--- 		isFinished = function(self)
--- 			return self.properties.finished
--- 		end,
+		---Whether or not the animation is finished
+		---@return boolean finished
+		isFinished = function(self)
+			return self.properties.finished
+		end,
 
--- 		---Edit the animation's start position and destination position
--- 		---@param new_start_position SWMatrix|nil The new start position, if nil, it will not be changed
--- 		---@param new_destination_position SWMatrix|nil The new destination position, if nil, it will not be changed
--- 		---@param new_current_position SWMatrix|nil The new current position, if nil, it will not be changed
--- 		---@param new_speed number|nil The new increment, if nil, it will not be changed
--- 		---@return nil
--- 		edit = function(self, new_start_position, new_destination_position, new_current_position, new_speed)
--- 			self.properties.start_pos = new_start_position or self.properties.start_pos
--- 			self.properties.destination_pos = new_destination_position or self.properties.destination_pos
--- 			self.properties.current_pos = new_current_position or self.properties.current_pos
--- 			self.properties.increment = new_speed or self.properties.increment
--- 		end
--- 	}
--- end
+		---Edit the animation's start position and destination position
+		---@param new_start_position SWMatrix|nil The new start position, if nil, it will not be changed
+		---@param new_destination_position SWMatrix|nil The new destination position, if nil, it will not be changed
+		---@param new_current_position SWMatrix|nil The new current position, if nil, it will not be changed
+		---@param new_speed number|nil The new increment, if nil, it will not be changed
+		---@return nil
+		edit = function(self, new_start_position, new_destination_position, new_current_position, new_speed)
+			self.properties.start_pos = new_start_position or self.properties.start_pos
+			self.properties.destination_pos = new_destination_position or self.properties.destination_pos
+			self.properties.current_pos = new_current_position or self.properties.current_pos
+			self.properties.increment = new_speed or self.properties.increment
+		end
+	}
+end
 
 ---Remove an animation by its ID
 ---@param id integer The ID of the animation. You can get the ID of an animation on creation. For example: cuhFramework.animation.createAnimation(...).properties.id
@@ -1773,26 +1769,24 @@ cuhFramework.backend.updates:insert(function()
 				-- jggjh
 				::continue::
 			end
-		-- elseif v.type == "exponential" then
-		-- 	for i2 = 1, 3 do
-		-- 		-- check if reached destination, fuck precision all the homies hate precision btw
-		-- 		if v.current_pos[12 + i2] > v.destination_pos[12 + i2] - v.increment and v.current_pos[12 + i2] < v.destination_pos[12 + i2] + v.increment then
-		-- 			got_to_destination_count = got_to_destination_count + 1
-		-- 			goto continue
-		-- 		end
+		elseif v.type == "exponential" then
+			for i2 = 1, 3 do
+				-- check if reached destination, fuck precision all the homies hate precision btw
+				if v.current_pos[12 + i2] > v.destination_pos[12 + i2] - v.increment and v.current_pos[12 + i2] < v.destination_pos[12 + i2] + v.increment then
+					got_to_destination_count = got_to_destination_count + 1
+					goto continue
+				end
 
-		-- 		cuhFramework.chat.send_message("s", v.current_pos[12 + i2].." | "..v.destination_pos[12 + i2] - v.increment.."\n"..v.current_pos[12 + i2].." | "..v.destination_pos[12 + i2] + v.increment)
+				-- some checks and moving and some stuff too and other stuff
+				if v.current_pos[12 + i2] < v.destination_pos[12 + i2] then
+					v.current_pos[12 + i2] = v.current_pos[12 + i2] * (1.1 ^ v.increment)
+				elseif v.current_pos[12 + i2] > v.destination_pos[12 + i2] then
+					v.current_pos[12 + i2] = v.current_pos[12 + i2] / (1.1 ^ v.increment)
+				end
 
-		-- 		-- some checks and moving and some stuff too and other stuff
-		-- 		if v.current_pos[12 + i2] < v.destination_pos[12 + i2] then
-		-- 			v.current_pos[12 + i2] = cuhFramework.utilities.number.clamp(v.current_pos[12 + i2] / (1 + v.increment), v.start_pos[12 + i2], v.destination_pos[12 + i2])
-		-- 		elseif v.current_pos[12 + i2] > v.destination_pos[12 + i2] then
-		-- 			v.current_pos[12 + i2] = cuhFramework.utilities.number.clamp(v.current_pos[12 + i2] * (1 + v.increment), v.start_pos[12 + i2], v.destination_pos[12 + i2])
-		-- 		end
-
-		-- 		-- jggjh
-		-- 		::continue::
-		-- 	end
+				-- jggjh
+				::continue::
+			end
 		end
 
 		-- check if animation is done
@@ -2422,18 +2416,15 @@ end
 ---@param input string The string to encode
 ---@return string encoded_string The URL encoded string
 cuhFramework.http.url_encode = function(input)
-    if type(input) == "string" then
-        input = string.gsub(input, "\n", "\r\n")
-        input = string.gsub(input, "([^%w ])",
-            function (c)
-				return string.format("%%%02X", string.byte(c))
-			end
-		)
+	input = tostring(input)
+	input = string.gsub(input, "\n", "\r\n")
+	input = string.gsub(input, "([^%w ])",
+		function (c)
+			return string.format("%%%02X", string.byte(c))
+		end
+	)
 
-		input = string.gsub(input, " ", "+")
-    end
-
-    return input
+	input = string.gsub(input, " ", "+")
 end
 
 ---URL decode a string
