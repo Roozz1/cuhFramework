@@ -2425,6 +2425,8 @@ cuhFramework.http.url_encode = function(input)
 	)
 
 	input = string.gsub(input, " ", "+")
+
+	return input
 end
 
 ---URL decode a string
