@@ -1030,6 +1030,25 @@ end
 --//Framework - Custom Callbacks\\--
 ----------------------------------------
 ----------------------------------------
+cuhFramework.customCallbacks.onCommandActivated = {
+	connections = {},
+	---Connect a function to onCommandActivated (custom)
+	---@param callback function
+	connect = function(self, callback)
+		local id = #self.connections + 1
+		self.connections[id] = callback
+
+		return {
+			connection_id = id,
+			disconnect = function()
+				self.connections[id] = nil
+			end
+		}
+	end
+}
+
+----------------
+
 cuhFramework.customCallbacks.onVehicleSpawn = {
 	connections = {},
 	---Connect a function to onVehicleSpawn (custom)
@@ -2040,11 +2059,19 @@ cuhFramework.callbacks.onCustomCommand:connect(function(msg, peer_id, is_admin, 
 		-- caps sensitive
 		if v.caps_sensitive then
 			if v.command_name == lookFor or cuhFramework.utilities.table.isValueInTable(v.shorthands, lookFor) then
+				for _, con in pairs(cuhFramework.customCallbacks.onCommandActivated.connections) do
+					con(v, msg, peer_id, is_admin, is_auth, lookFor, ...)
+				end
+
 				v.callback(msg, peer_id, is_admin, is_auth, lookFor, ...)
 			end
 		else
 			-- not caps sensitive
 			if v.command_name:lower() == lookFor:lower() or cuhFramework.utilities.table.isValueInTable(cuhFramework.utilities.table.lowercaseStringValues(v.shorthands), lookFor:lower()) then
+				for _, con in pairs(cuhFramework.customCallbacks.onCommandActivated.connections) do
+					con(v, msg, peer_id, is_admin, is_auth, lookFor, ...)
+				end
+
 				v.callback(msg, peer_id, is_admin, is_auth, lookFor, ...)
 			end
 		end
