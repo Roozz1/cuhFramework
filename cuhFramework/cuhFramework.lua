@@ -2028,6 +2028,7 @@ end
 
 ---Manage commands [Backend]
 cuhFramework.callbacks.onCustomCommand:connect(function(msg, peer_id, is_admin, is_auth, command, ...)
+	local player = cuhFramework.players.getPlayerByPeerId(peer_id)
 	local args = {...}
 	command = command:sub(2, #command) --"?hey" becomes "hey"
 
@@ -2060,7 +2061,7 @@ cuhFramework.callbacks.onCustomCommand:connect(function(msg, peer_id, is_admin, 
 		if v.caps_sensitive then
 			if v.command_name == lookFor or cuhFramework.utilities.table.isValueInTable(v.shorthands, lookFor) then
 				for _, con in pairs(cuhFramework.customCallbacks.onCommandActivated.connections) do
-					con(v, msg, peer_id, is_admin, is_auth, lookFor, ...)
+					con(v, player, ...)
 				end
 
 				v.callback(msg, peer_id, is_admin, is_auth, lookFor, ...)
@@ -2069,7 +2070,7 @@ cuhFramework.callbacks.onCustomCommand:connect(function(msg, peer_id, is_admin, 
 			-- not caps sensitive
 			if v.command_name:lower() == lookFor:lower() or cuhFramework.utilities.table.isValueInTable(cuhFramework.utilities.table.lowercaseStringValues(v.shorthands), lookFor:lower()) then
 				for _, con in pairs(cuhFramework.customCallbacks.onCommandActivated.connections) do
-					con(v, msg, peer_id, is_admin, is_auth, lookFor, ...)
+					con(v, player, ...)
 				end
 
 				v.callback(msg, peer_id, is_admin, is_auth, lookFor, ...)
