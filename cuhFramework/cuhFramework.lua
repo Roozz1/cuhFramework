@@ -1601,7 +1601,15 @@ end
 ------------------------
 ------Intellisense
 ------------------------
----@class animation_data
+---@class animation
+---@field properties animation_properties
+---@field remove function<animation> Remove this animation
+---@field setPaused function<animation, boolean> Pause/Unpause this animation
+---@field setLooped function<animation, boolean> Make this animation loop/not loop
+---@field isFinished function<animation> Returns whether or not the animation is finished. Same as doing animation.properties.finished
+---@field edit function<animation, SWMatrix|nil, SWMatrix|nil, SWMatrix|nil, number|nil> Edit this animation. Order: new_start_position, new_destination_position, new_current_position, new_increment. If any is nil, it will not be changed
+
+---@class animation_properties
 ---@field start_pos SWMatrix The start position of the animation
 ---@field current_pos SWMatrix The position the animation is currently at
 ---@field destination_pos SWMatrix The end position of the animation
@@ -1616,7 +1624,7 @@ end
 ------------------------
 ------Animation
 ------------------------
----@type table<integer, animation_data>
+---@type table<integer, animation>
 cuhFramework.animation.ongoingAnimations = {}
 
 ---Create a linear animation. Does not support rotation, only XYZ position
@@ -1624,57 +1632,39 @@ cuhFramework.animation.ongoingAnimations = {}
 ---@param desired_position SWMatrix The position for the animation to end at
 ---@param increment number I can't think of the right words to use to explain this, you probably know what this is though, mainly because you're a smart, lovable human being, and you are truly awesome. You make other people's days good, even when you're having a bad day, and that is why you are truly awesome and lovable. You are the person everyone looks up to when they desire to be a perfect human being. Keep being you. Because you are amazing.
 ---@param should_loop boolean Whether or not the animation should repeat upon reaching the desired position
----@param callback function<animation_data> The function that is called every animation tick. One argument is passed through, the animation data
+---@param callback function<animation> The function that is called every animation tick. One argument is passed through, the animation itself
 cuhFramework.animation.createLinearAnimation = function(start_position, desired_position, increment, should_loop, callback)
 	local id = #cuhFramework.animation.ongoingAnimations + 1
 	cuhFramework.animation.ongoingAnimations[id] = {
-		start_pos = start_position,
-		current_pos = matrix.translation(start_position[13], start_position[14], start_position[15]),
-		destination_pos = desired_position,
-		paused = false,
-		looping = should_loop,
-		increment = increment,
-		callback = callback,
-		id = id,
-		finished = false,
-		type = "linear"
-	}
+		properties = {
+			start_pos = start_position,
+			current_pos = matrix.translation(start_position[13], start_position[14], start_position[15]),
+			destination_pos = desired_position,
+			paused = false,
+			looping = should_loop,
+			increment = increment,
+			callback = callback,
+			id = id,
+			finished = false,
+			type = "linear"
+		},
 
-	return {
-		properties = cuhFramework.animation.ongoingAnimations[id],
-
-		---Remove the animation
-		---@return nil
 		remove = function(self)
 			return cuhFramework.animation.removeAnimation(self.properties.id)
 		end,
 
-		---Pause/unpause the animation
-		---@param state boolean true = pause, false = unpause
-		---@return nil
 		setPaused = function(self, state)
 			self.properties.paused = state
 		end,
 
-		---Set whether or not the animation loops
-		---@param state boolean true = loop, false = don't loop
-		---@return nil
 		setLooped = function(self, state)
 			self.properties.looping = state
 		end,
 
-		---Whether or not the animation is finished
-		---@return boolean finished
 		isFinished = function(self)
 			return self.properties.finished
 		end,
 
-		---Edit the animation's start position and destination position
-		---@param new_start_position SWMatrix|nil The new start position, if nil, it will not be changed
-		---@param new_destination_position SWMatrix|nil The new destination position, if nil, it will not be changed
-		---@param new_current_position SWMatrix|nil The new current position, if nil, it will not be changed
-		---@param new_increment number|nil The new increment, if nil, it will not be changed
-		---@return nil
 		edit = function(self, new_start_position, new_destination_position, new_current_position, new_increment)
 			self.properties.start_pos = new_start_position or self.properties.start_pos
 			self.properties.destination_pos = new_destination_position or self.properties.destination_pos
@@ -1682,71 +1672,8 @@ cuhFramework.animation.createLinearAnimation = function(start_position, desired_
 			self.properties.increment = new_increment or self.properties.increment
 		end
 	}
-end
 
----Create an exponential animation. Does not support rotation, only XYZ position
----@param start_position SWMatrix The position for the animation to start at
----@param desired_position SWMatrix The position for the animation to end at
----@param speed number The speed of the animation
----@param should_loop boolean Whether or not the animation should repeat upon reaching the desired position
----@param callback function<animation_data> The function that is called every animation tick. One argument is passed through, the animation data
-cuhFramework.animation.createExponentialAnimation = function(start_position, desired_position, speed, should_loop, callback)
-	local id = #cuhFramework.animation.ongoingAnimations + 1
-	cuhFramework.animation.ongoingAnimations[id] = {
-		start_pos = start_position,
-		current_pos = matrix.translation(start_position[13], start_position[14], start_position[15]),
-		destination_pos = desired_position,
-		paused = false,
-		looping = should_loop,
-		increment = speed,
-		callback = callback,
-		id = id,
-		finished = false,
-		type = "exponential"
-	}
-
-	return {
-		properties = cuhFramework.animation.ongoingAnimations[id],
-
-		---Remove the animation
-		---@return nil
-		remove = function(self)
-			return cuhFramework.animation.removeAnimation(self.properties.id)
-		end,
-
-		---Pause/unpause the animation
-		---@param state boolean true = pause, false = unpause
-		---@return nil
-		setPaused = function(self, state)
-			self.properties.paused = state
-		end,
-
-		---Set whether or not the animation loops
-		---@param state boolean true = loop, false = don't loop
-		---@return nil
-		setLooped = function(self, state)
-			self.properties.looping = state
-		end,
-
-		---Whether or not the animation is finished
-		---@return boolean finished
-		isFinished = function(self)
-			return self.properties.finished
-		end,
-
-		---Edit the animation's start position and destination position
-		---@param new_start_position SWMatrix|nil The new start position, if nil, it will not be changed
-		---@param new_destination_position SWMatrix|nil The new destination position, if nil, it will not be changed
-		---@param new_current_position SWMatrix|nil The new current position, if nil, it will not be changed
-		---@param new_speed number|nil The new increment, if nil, it will not be changed
-		---@return nil
-		edit = function(self, new_start_position, new_destination_position, new_current_position, new_speed)
-			self.properties.start_pos = new_start_position or self.properties.start_pos
-			self.properties.destination_pos = new_destination_position or self.properties.destination_pos
-			self.properties.current_pos = new_current_position or self.properties.current_pos
-			self.properties.increment = new_speed or self.properties.increment
-		end
-	}
+	return cuhFramework.animation.ongoingAnimations[id]
 end
 
 ---Remove an animation by its ID
@@ -1760,47 +1687,29 @@ end
 cuhFramework.backend.updates:insert(function()
 	for i, v in pairs(cuhFramework.animation.ongoingAnimations) do
 		-- quick check
-		if v.paused then
+		if v.properties.paused then
 			goto continue
 		end
 
-		if v.looping and v.finished then
-			v.finished = false
+		if v.properties.looping and v.properties.finished then
+			v.properties.finished = false
 		end
 
 		-- it gets messy kinda, but yeah main animation handling stuff here
 		local got_to_destination_count = 0
-		if v.type == "linear" then
+		if v.properties.type == "linear" then
 			for i2 = 1, 3 do
 				-- check if reached destination, fuck precision all the homies hate precision btw
-				if v.current_pos[12 + i2] > v.destination_pos[12 + i2] - v.increment and v.current_pos[12 + i2] < v.destination_pos[12 + i2] + v.increment then
+				if v.properties.current_pos[12 + i2] > v.properties.destination_pos[12 + i2] - v.properties.increment and v.properties.current_pos[12 + i2] < v.properties.destination_pos[12 + i2] + v.properties.increment then
 					got_to_destination_count = got_to_destination_count + 1
 					goto continue
 				end
 
 				-- some checks and moving and some stuff too and other stuff
-				if v.current_pos[12 + i2] < v.destination_pos[12 + i2] then
-					v.current_pos[12 + i2] = v.current_pos[12 + i2] + v.increment
-				elseif v.current_pos[12 + i2] > v.destination_pos[12 + i2] then
-					v.current_pos[12 + i2] = v.current_pos[12 + i2] - v.increment
-				end
-
-				-- jggjh
-				::continue::
-			end
-		elseif v.type == "exponential" then
-			for i2 = 1, 3 do
-				-- check if reached destination, fuck precision all the homies hate precision btw
-				if v.current_pos[12 + i2] > v.destination_pos[12 + i2] - v.increment and v.current_pos[12 + i2] < v.destination_pos[12 + i2] + v.increment then
-					got_to_destination_count = got_to_destination_count + 1
-					goto continue
-				end
-
-				-- some checks and moving and some stuff too and other stuff
-				if v.current_pos[12 + i2] < v.destination_pos[12 + i2] then
-					v.current_pos[12 + i2] = v.current_pos[12 + i2] * (1.1 ^ v.increment)
-				elseif v.current_pos[12 + i2] > v.destination_pos[12 + i2] then
-					v.current_pos[12 + i2] = v.current_pos[12 + i2] / (1.1 ^ v.increment)
+				if v.properties.current_pos[12 + i2] < v.properties.destination_pos[12 + i2] then
+					v.properties.current_pos[12 + i2] = v.properties.current_pos[12 + i2] + v.properties.increment
+				elseif v.properties.current_pos[12 + i2] > v.properties.destination_pos[12 + i2] then
+					v.properties.current_pos[12 + i2] = v.properties.current_pos[12 + i2] - v.properties.increment
 				end
 
 				-- jggjh
@@ -1811,18 +1720,18 @@ cuhFramework.backend.updates:insert(function()
 		-- check if animation is done
 		if got_to_destination_count == 3 then -- 3 because x y z
 			-- set finished
-			v.finished = true
+			v.properties.finished = true
 
 			-- repeat anim
-			if v.looping then
-				local old = v.start_pos
-				v.start_pos = v.destination_pos
-				v.destination_pos = old
+			if v.properties.looping then
+				local old = v.properties.start_pos
+				v.properties.start_pos = v.properties.destination_pos
+				v.properties.destination_pos = old
 			end
 		end
 
 		-- call callback, also since we are using ":", v is passed into the function!! wooooooooo!!!!!
-		v:callback()
+		v.properties.callback(v)
 
 		-- good old goto statement
 		::continue::
@@ -2366,11 +2275,7 @@ end
 ---@param isDedicatedServer boolean|nil Whether or not this addon is running in a dedicated server, set to true if this addon is running in a dedicated server
 ---@return integer playerCount Number of players in the server
 cuhFramework.players.getPlayerCount = function(isDedicatedServer)
-	local count = 0
-
-	for _ in pairs(cuhFramework.players.connectedPlayers) do
-		count = count + 1
-	end
+	local count = cuhFramework.utilities.table.getValueCountOfTable(cuhFramework.players.connectedPlayers)
 
 	if isDedicatedServer then
 		return count - 1
@@ -2437,7 +2342,7 @@ end
 ---@param response boolean The response of the request
 ---@return boolean ok Whether or not the request was successful
 cuhFramework.http.ok = function(response)
-	return response ~= ("Connection closed unexpectedly" and "connect(): Connection refused" and "recv(): Connection reset by peer")
+	return response ~= "Connection closed unexpectedly" and response ~= "connect(): Connection refused" and response ~=  "recv(): Connection reset by peer" and response ~= "timeout"
 end
 
 ---URL encode a string
@@ -2842,6 +2747,13 @@ end
 ------------------------
 ------Intellisense
 ------------------------
+---@class screenUiObject
+---@field properties screenUiProperties The properties of this screen UI object
+---@field remove function<screenUiObject> Remove this UI
+---@field edit function<screenUiObject, string, number, number, player> Edit this UI (new_text, new_x, new_y, and player can be nil). If any of these parameters are nil, then the corresponding property will not be changed
+---@field setVisibility function<screenUiObject, boolean> Whether or not this UI is visible
+---@field refresh function<screenUiObject> Refreshes this UI object
+
 ---@class screenUiProperties
 ---@field x integer horizontal_offset, -1 = left, 1 = right
 ---@field y integer vertical_offset, -1 = bottom, 1 = top
@@ -2849,12 +2761,6 @@ end
 ---@field player player|nil The player that this UI object is being shown to. Nil if everyone
 ---@field id integer The ID of this UI object
 ---@field visible boolean Whether or not this UI object is visible
-
----@class screenUiObject
----@field properties screenUiProperties The properties of this screen UI object
----@field remove function<screenUiObject> Remove this UI
----@field edit function<screenUiObject, string, number, number, player> Edit this UI (new_text, new_x, new_y, and player can be nil). If any of these parameters are nil, then the corresponding property will not be changed
----@field setVisibility function<screenUiObject, boolean> Whether or not this UI is visible
 
 ------------------------
 ------Screen UI
