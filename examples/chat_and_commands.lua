@@ -10,10 +10,6 @@ my_command = cuhFramework.commands.create("purge", {"p"}, false, "myaddon", func
     -- Pack all command args into a table (unused in this, but this is how you get command arguments)
     local args = {...}
 
-    -- Since we have a prefix, args[1] would be the actual command, while command would be the prefix, so let's shift things around
-    command = args[1]
-    args[1] = nil
-
     -- Clear chat for everyone when this command is activated
     cuhFramework.chat.clear()
     -- to clear it for a specifiy person, specify the player of the person you want to hide chat for, eg:
