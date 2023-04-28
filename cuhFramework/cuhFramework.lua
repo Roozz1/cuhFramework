@@ -1413,12 +1413,12 @@ cuhFramework.utilities.miscellaneous = {}
 ---Switch between two values depending on the state of something
 ---@param off any The return value if switch is false
 ---@param on any The return value if switch is true
----@param switch boolean Switch between the off and on value
+---@param switch boolean|any Switch between the off and on value
 ---@return any
 cuhFramework.utilities.miscellaneous.switchbox = function(off, on, switch)
-	if switch == true then -- not using "if switch then" because i want switch to 100% be a bool
+	if switch then
 		return on
-	elseif switch == false then
+	elseif switch then
 		return off
 	end
 end
