@@ -2764,6 +2764,7 @@ end
 ---@field remove function<screenUiObject> Remove this UI
 ---@field edit function<screenUiObject, string, number, number, player> Edit this UI (new_text, new_x, new_y, and player can be nil). If any of these parameters are nil, then the corresponding property will not be changed
 ---@field setVisibility function<screenUiObject, boolean> Whether or not this UI is visible
+---@field refresh function<screenUiObject> Refresh this UI object
 
 ------------------------
 ------Screen UI
