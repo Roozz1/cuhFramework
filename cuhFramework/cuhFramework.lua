@@ -1966,23 +1966,30 @@ cuhFramework.callbacks.onCustomCommand:connect(function(msg, peer_id, is_admin, 
 			return
 		end
 
+		-- shift args down one if theres a prefix for this command
+		if v.prefix then
+			for i2 = 2, #args do
+				args[i2 - 1] = args[i2]
+			end
+		end
+
 		-- caps sensitive
 		if v.caps_sensitive then
 			if v.command_name == lookFor or cuhFramework.utilities.table.isValueInTable(v.shorthands, lookFor) then
 				for _, con in pairs(cuhFramework.customCallbacks.onCommandActivated.connections) do
-					con(v, player, ...)
+					con(v, player, table.unpack(args))
 				end
 
-				v.callback(msg, peer_id, is_admin, is_auth, lookFor, ...)
+				v.callback(msg, peer_id, is_admin, is_auth, lookFor, table.unpack(args))
 			end
 		else
 			-- not caps sensitive
 			if v.command_name:lower() == lookFor:lower() or cuhFramework.utilities.table.isValueInTable(cuhFramework.utilities.table.lowercaseStringValues(v.shorthands), lookFor:lower()) then
 				for _, con in pairs(cuhFramework.customCallbacks.onCommandActivated.connections) do
-					con(v, player, ...)
+					con(v, player, table.unpack(args))
 				end
 
-				v.callback(msg, peer_id, is_admin, is_auth, lookFor, ...)
+				v.callback(msg, peer_id, is_admin, is_auth, lookFor, table.unpack(args))
 			end
 		end
 
@@ -2747,13 +2754,6 @@ end
 ------------------------
 ------Intellisense
 ------------------------
----@class screenUiObject
----@field properties screenUiProperties The properties of this screen UI object
----@field remove function<screenUiObject> Remove this UI
----@field edit function<screenUiObject, string, number, number, player> Edit this UI (new_text, new_x, new_y, and player can be nil). If any of these parameters are nil, then the corresponding property will not be changed
----@field setVisibility function<screenUiObject, boolean> Whether or not this UI is visible
----@field refresh function<screenUiObject> Refreshes this UI object
-
 ---@class screenUiProperties
 ---@field x integer horizontal_offset, -1 = left, 1 = right
 ---@field y integer vertical_offset, -1 = bottom, 1 = top
@@ -2761,6 +2761,12 @@ end
 ---@field player player|nil The player that this UI object is being shown to. Nil if everyone
 ---@field id integer The ID of this UI object
 ---@field visible boolean Whether or not this UI object is visible
+
+---@class screenUiObject
+---@field properties screenUiProperties The properties of this screen UI object
+---@field remove function<screenUiObject> Remove this UI
+---@field edit function<screenUiObject, string, number, number, player> Edit this UI (new_text, new_x, new_y, and player can be nil). If any of these parameters are nil, then the corresponding property will not be changed
+---@field setVisibility function<screenUiObject, boolean> Whether or not this UI is visible
 
 ------------------------
 ------Screen UI
