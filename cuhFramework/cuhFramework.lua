@@ -1418,7 +1418,7 @@ cuhFramework.utilities.miscellaneous = {}
 cuhFramework.utilities.miscellaneous.switchbox = function(off, on, switch)
 	if switch then
 		return on
-	elseif switch then
+	else
 		return off
 	end
 end
