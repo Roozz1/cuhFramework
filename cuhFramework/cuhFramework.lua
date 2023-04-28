@@ -1937,12 +1937,14 @@ end
 
 ---Manage commands [Backend]
 cuhFramework.callbacks.onCustomCommand:connect(function(msg, peer_id, is_admin, is_auth, command, ...)
+	-- get variables
 	local player = cuhFramework.players.getPlayerByPeerId(peer_id)
-	local args = {...}
 	command = command:sub(2, #command) --"?hey" becomes "hey"
 
 	for i, v in pairs(cuhFramework.commands.registeredCommands) do
+		-- stuffs
 		local lookFor = command
+		local args = {...}
 
 		-- check prefix (bit messy)
 		if v.prefix then
@@ -1966,13 +1968,6 @@ cuhFramework.callbacks.onCustomCommand:connect(function(msg, peer_id, is_admin, 
 			return
 		end
 
-		-- shift args down one if theres a prefix for this command
-		if v.prefix then
-			for i2 = 2, #args do
-				args[i2 - 1] = args[i2]
-			end
-		end
-
 		-- caps sensitive
 		if v.caps_sensitive then
 			if v.command_name == lookFor or cuhFramework.utilities.table.isValueInTable(v.shorthands, lookFor) then
@@ -1980,6 +1975,7 @@ cuhFramework.callbacks.onCustomCommand:connect(function(msg, peer_id, is_admin, 
 					con(v, player, table.unpack(args))
 				end
 
+				args[1] = nil
 				v.callback(msg, peer_id, is_admin, is_auth, lookFor, table.unpack(args))
 			end
 		else
@@ -1989,6 +1985,7 @@ cuhFramework.callbacks.onCustomCommand:connect(function(msg, peer_id, is_admin, 
 					con(v, player, table.unpack(args))
 				end
 
+				args[1] = nil
 				v.callback(msg, peer_id, is_admin, is_auth, lookFor, table.unpack(args))
 			end
 		end
