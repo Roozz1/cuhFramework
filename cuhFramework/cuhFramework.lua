@@ -2453,6 +2453,7 @@ end
 ---@field get_position function<object> Get the position of this object
 ---@field get_data function<object> Returns the raw data of this object provided by Stormworks
 ---@field explode function<object, number|nil> Explodes this object, while also despawning this object
+---@field set_tooltip function<object, string> Sets the tooltip of this object
 
 ------------------------
 ------Objects
@@ -2498,6 +2499,10 @@ cuhFramework.objects.spawnObject = function(position, object_type)
 		explode = function(self, magnitude)
 			cuhFramework.references.explode(self:get_position(), magnitude or 0.1)
 			return self:despawn()
+		end,
+
+		set_tooltip = function(self, tooltip)
+			return server.setCharacterTooltip(self.properties.object_id, tooltip)
 		end
 	}
 
@@ -2551,6 +2556,8 @@ end
 ---@field set_move_target function<creature, SWMatrix> Make the creature walk to this position
 ---@field get_data function<creature> Returns the raw data of this creature provided by Stormworks
 ---@field explode function<creature, number|nil> Explodes this creature, while also despawning this creature
+---@field set_tooltip function<creature, string> Sets the tooltip of this creature
+---@field set_character_data function<creature, number, boolean, boolean> Sets the data of this creature
 
 ------------------------
 ------Creatures
@@ -2617,6 +2624,14 @@ cuhFramework.creatures.spawnCreature = function(position, creature_type, size_mu
 		explode = function(self, magnitude)
 			cuhFramework.references.explode(self:get_position(), magnitude or 0.1)
 			return self:despawn()
+		end,
+
+		set_tooltip = function(self, tooltip)
+			return server.setCreatureTooltip(self.properties.object_id, tooltip)
+		end,
+
+		set_creature_data = function(self, hp, interactable, ai)
+			return server.setCharacterData(self.properties.object_id, hp, interactable, ai)
 		end
 	}
 
@@ -2661,6 +2676,8 @@ end
 ---@field damage function<character, number> Damage this character, negative number = heal
 ---@field get_data function<character> Returns the raw data of this character provided by Stormworks
 ---@field explode function<character, number|nil> Explodes this character, while also despawning this character
+---@field set_tooltip function<character, string> Sets the tooltip of this character
+---@field set_character_data function<character, number, boolean, boolean> Sets the data of this character
 
 ------------------------
 ------Characters
@@ -2721,6 +2738,14 @@ cuhFramework.characters.spawnCharacter = function(position, outfit_id)
 		explode = function(self, magnitude)
 			cuhFramework.references.explode(self:get_position(), magnitude or 0.1)
 			return self:despawn()
+		end,
+
+		set_tooltip = function(self, tooltip)
+			return server.setCharacterTooltip(self.properties.object_id, tooltip)
+		end,
+
+		set_character_data = function(self, hp, interactable, ai)
+			return server.setCharacterData(self.properties.object_id, hp, interactable, ai)
 		end
 	}
 
