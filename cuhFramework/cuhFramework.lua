@@ -1851,7 +1851,6 @@ end
 ---@field command_name string The name of this command
 ---@field shorthands table The shorthands of this command
 ---@field caps_sensitive boolean|nil Whether or not this command is caps sensitive
----@field prefix string|nil The prefix of this command
 ---@field callback function The callback that is called upon the command being executed
 ---@field description string The description of the command, unused in cuhFramework, but may be useful if you want to create a '?help' command.
 
@@ -1865,10 +1864,9 @@ cuhFramework.commands.registeredCommands = {}
 ---@param command_name string The name of the command, example: "my_command"
 ---@param shorthands table|string|nil The shorthands of the command, basically additional command_names for the command, example: "m_c"
 ---@param caps_sensitive boolean|nil Whether or not the command is caps sensitive
----@param prefix string|nil The prefix of the command. For example: If the prefix is "addon", players will need to type "?addon (command_name)" in chat to activate the command. If nil, prefixes won't be used for this command
 ---@param callback function The function that will be called upon a player typing the command
 ---@param description string|nil The description of this command
-cuhFramework.commands.create = function(command_name, shorthands, caps_sensitive, prefix, callback, description)
+cuhFramework.commands.create = function(command_name, shorthands, caps_sensitive, callback, description)
 	if type(shorthands) == "string" then
 		shorthands = {shorthands}
 	end
@@ -1879,7 +1877,6 @@ cuhFramework.commands.create = function(command_name, shorthands, caps_sensitive
 		command_name = command_name,
 		shorthands = shorthands or {},
 		caps_sensitive = caps_sensitive,
-		prefix = prefix,
 		callback = callback,
 		description = description or ""
 	}
@@ -1891,14 +1888,12 @@ cuhFramework.commands.create = function(command_name, shorthands, caps_sensitive
 		---@param new_command_name string|nil The name of the command, example: "my_command". If this is nil, the name of the command will not be changed
 		---@param new_shorthands table|string|nil The shorthands of the command, basically additional command_names for the command, example: "m_c". If this is nil, the shorthands of the command will not be changed
 		---@param new_caps_sensitive boolean|nil Whether or not the command should be caps sensitive. If this is nil, the command will remain caps sensitive or not caps sensitive depending on what it was set to beforehand
-		---@param new_prefix string|nil The new prefix of the command. For example: If the prefix is "addon", players will need to type "?addon (command_name)" in chat to activate the command. If nil, prefixes won't be used for this command
 		---@param new_callback function|nil The function that will be called upon a player typing the command. If this is nil, the command callback will not be changed
 		---@return table command The command itself
-		edit = function(self, new_command_name, new_shorthands, new_caps_sensitive, new_prefix, new_callback)
+		edit = function(self, new_command_name, new_shorthands, new_caps_sensitive, new_callback)
 			self.properties.command_name = new_command_name or self.properties.command_name
 			self.properties.shorthands = new_shorthands or self.properties.shorthands
 			self.properties.caps_sensitive = new_caps_sensitive or self.properties.caps_sensitive
-			self.properties.prefix = new_prefix or self.properties.prefix
 			self.properties.callback = new_callback or self.properties.callback
 
 			return self
@@ -1939,58 +1934,28 @@ end
 cuhFramework.callbacks.onCustomCommand:connect(function(msg, peer_id, is_admin, is_auth, command, ...)
 	-- get variables
 	local player = cuhFramework.players.getPlayerByPeerId(peer_id)
-	command = command:sub(2, #command) --"?hey" becomes "hey"
+	local edited_command = command:sub(2, -1) --"?hey" becomes "hey"
 
 	for i, v in pairs(cuhFramework.commands.registeredCommands) do
-		-- stuffs
-		local lookFor = command
-		local args = {...}
-
-		-- check prefix (bit messy)
-		if v.prefix then
-			if v.caps_sensitive then
-				if lookFor ~= v.prefix then
-					goto continue
-				else
-					lookFor = args[1]
-				end
-			else
-				if lookFor:lower() ~= v.prefix:lower() then
-					goto continue
-				else
-					lookFor = args[1]
-				end
-			end
-		end
-
-		-- safety
-		if not lookFor then -- args[1] doesn't exist
-			return
-		end
-
-		-- caps sensitive
 		if v.caps_sensitive then
-			if v.command_name == lookFor or cuhFramework.utilities.table.isValueInTable(v.shorthands, lookFor) then
+			-- caps sensitive
+			if v.command_name == edited_command or cuhFramework.utilities.table.isValueInTable(v.shorthands, edited_command) then
 				for _, con in pairs(cuhFramework.customCallbacks.onCommandActivated.connections) do
-					con(v, player, table.unpack(args))
+					con(v, player, ...)
 				end
 
-				args[1] = nil
-				v.callback(msg, peer_id, is_admin, is_auth, lookFor, table.unpack(args))
+				v.callback(msg, peer_id, is_admin, is_auth, command, ...)
 			end
 		else
 			-- not caps sensitive
-			if v.command_name:lower() == lookFor:lower() or cuhFramework.utilities.table.isValueInTable(cuhFramework.utilities.table.lowercaseStringValues(v.shorthands), lookFor:lower()) then
+			if v.command_name:lower() == edited_command:lower() or cuhFramework.utilities.table.isValueInTable(cuhFramework.utilities.table.lowercaseStringValues(v.shorthands), edited_command:lower()) then
 				for _, con in pairs(cuhFramework.customCallbacks.onCommandActivated.connections) do
-					con(v, player, table.unpack(args))
+					con(v, player, ...)
 				end
 
-				args[1] = nil
-				v.callback(msg, peer_id, is_admin, is_auth, lookFor, table.unpack(args))
+				v.callback(msg, peer_id, is_admin, is_auth, command, ...)
 			end
 		end
-
-	    ::continue::
 	end
 end)
 
@@ -2303,6 +2268,10 @@ end
 ---@field callback function|nil The function that will be called when this request receives a reply
 ---@field id integer The ID of the request data
 
+---@class url_arg
+---@field name string The name of the argument to be passed through (becomes: "?name=value")
+---@field value string The value itself (becomes: "?name=value")
+
 ------------------------
 ------HTTP
 ------------------------
@@ -2347,6 +2316,27 @@ end
 ---@return boolean ok Whether or not the request was successful
 cuhFramework.http.ok = function(response)
 	return response ~= "Connection closed unexpectedly" and response ~= "connect(): Connection refused" and response ~=  "recv(): Connection reset by peer" and response ~= "timeout"
+end
+
+---Adds arguments to a url. Example: "/get?my_argument=1", 
+---@param url string The URL itself
+---@param ... url_arg The arguments to plop into the URL (eg: {name = "yo", value="hey"}, {name="hey", value="yo"}). Do not use custom indexes
+---@return string url The URL with the arguments added
+cuhFramework.http.url_args = function(url, ...)
+	-- convert args to stuffs tghfgdfd
+	local args = {}
+	local packed = {...}
+
+	for i, v in pairs(packed) do
+		if i == 1 then
+			table.insert(args, "?"..cuhFramework.http.url_encode(v.name).."="..cuhFramework.http.url_encode(v.value))
+		else
+			table.insert(args, "&"..cuhFramework.http.url_encode(v.name).."="..cuhFramework.http.url_encode(v.value))
+		end
+	end
+
+	-- anddd return
+	return url..table.concat(packed)
 end
 
 ---URL encode a string
