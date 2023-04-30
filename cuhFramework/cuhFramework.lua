@@ -2336,7 +2336,7 @@ cuhFramework.http.url_args = function(url, ...)
 	end
 
 	-- anddd return
-	return url..table.concat(packed)
+	return url..table.concat(args)
 end
 
 ---URL encode a string
