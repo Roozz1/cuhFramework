@@ -1200,7 +1200,7 @@ end
 cuhFramework.utilities.table.removeValueFromTable = function(tbl, value)
 	for i, v in pairs(tbl) do
 		if v == value then
-			tbl[i] = nil
+			table.remove(tbl, i)
 			return true
 		end
 	end
@@ -1411,8 +1411,8 @@ end
 cuhFramework.utilities.miscellaneous = {}
 
 ---Switch between two values depending on the state of something
----@param off any The return value if switch is false
----@param on any The return value if switch is true
+---@param off any The return value if switch is false/nil
+---@param on any The return value if switch is anything apart from false and nil
 ---@param switch boolean|any Switch between the off and on value
 ---@return any
 cuhFramework.utilities.miscellaneous.switchbox = function(off, on, switch)
@@ -2337,6 +2337,13 @@ cuhFramework.http.url_args = function(url, ...)
 
 	-- anddd return
 	return url..table.concat(args)
+end
+
+---Converts a string to a bool
+---@param input string The string to convert to a bool
+---@return boolean state True/false
+cuhFramework.http.stringToBool = function(input)
+	return input:lower() == "true"
 end
 
 ---URL encode a string
