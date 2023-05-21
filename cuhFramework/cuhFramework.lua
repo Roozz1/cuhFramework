@@ -1237,9 +1237,15 @@ end
 
 ---Get a random value in a table
 ---@param tbl table Table to get a random value from
----@return any randomTableValue The random table value
+---@return any randomTableValue The random table value, or nil if there are no values in the table
 cuhFramework.utilities.table.getRandomValue = function(tbl)
-	return tbl[math.random(1, #tbl)]
+	local count = #tbl
+
+	if count < 1 then
+		return
+	end
+
+	return tbl[math.random(1, count)]
 end
 
 ---Swap the values of a table with the index of the value
@@ -1461,6 +1467,7 @@ end
 ------------------------
 ------Delays
 ------------------------
+local delay_id = 0
 cuhFramework.utilities.delay = {}
 cuhFramework.utilities.delay.ongoingDelays = {}
 
@@ -1482,7 +1489,8 @@ cuhFramework.backend.updates:insert(cuhFramework.utilities.delay.update) -- refe
 ---@param callback function The function to call after the delay is manually called or when the delay naturally completes itself
 ---@param ... any Arguments to pass through to the delay callback
 cuhFramework.utilities.delay.create = function(duration, callback, ...)
-    local id = #cuhFramework.utilities.delay.ongoingDelays + 1
+    local id = delay_id
+	delay_id = delay_id + 1
 
 	cuhFramework.utilities.delay.ongoingDelays[id] = {
 		callback = callback,
@@ -1529,6 +1537,7 @@ end
 ------------------------
 ------Loops
 ------------------------
+local loop_id = 0
 cuhFramework.utilities.loop = {}
 cuhFramework.utilities.loop.ongoingLoops = {}
 
@@ -1550,7 +1559,8 @@ cuhFramework.backend.updates:insert(cuhFramework.utilities.loop.update) -- refer
 ---@param callback function The function to call after the loop is manually called or when a loop iteration has completed
 ---@param ... any Arguments to pass through to the loop callback
 cuhFramework.utilities.loop.create = function(duration, callback, ...)
-    local id = #cuhFramework.utilities.loop.ongoingLoops + 1
+    local id = loop_id
+	loop_id = loop_id + 1
 
 	cuhFramework.utilities.loop.ongoingLoops[id] = {
 		callback = callback,
@@ -2130,6 +2140,30 @@ cuhFramework.backend.givePlayerData = function(steam_id, name, peer_id, is_admin
 	cuhFramework.players.connectedPlayers[peer_id] = data
 end
 
+cuhFramework.backend.giveDataToCurrentPlayers = function(shouldFireEvents)
+	for i, v in pairs(server.getPlayers()) do
+		cuhFramework.backend.givePlayerData(v.steam_id, v.name, v.id, v.admin, v.auth)
+
+		if not shouldFireEvents then
+			goto continue
+		end
+
+		cuhFramework.utilities.delay.create(0.02, function()
+			for _, connection in pairs(cuhFramework.callbacks.onPlayerJoin.connections) do
+				connection(v.steam_id, v.name, v.id, v.admin, v.auth)
+			end
+
+			local char_id = server.getPlayerCharacterID(v.id)
+
+			for _, connection in pairs(cuhFramework.callbacks.onObjectLoad.connections) do
+				connection(char_id)
+			end
+		end)
+	end
+
+    ::continue::
+end
+
 cuhFramework.callbacks.onPlayerJoin:connect(function(steam_id, name, peer_id, is_admin, is_auth)
 	cuhFramework.backend.givePlayerData(steam_id, name, peer_id, is_admin, is_auth)
 
@@ -2143,21 +2177,11 @@ cuhFramework.callbacks.onPlayerJoin:connect(function(steam_id, name, peer_id, is
 	end)
 end)
 
-for i, v in pairs(server.getPlayers()) do
-	cuhFramework.backend.givePlayerData(v.steam_id, v.name, v.id, v.admin, v.auth)
+cuhFramework.backend.giveDataToCurrentPlayers(true)
 
-	cuhFramework.utilities.delay.create(0.02, function()
-		for _, connection in pairs(cuhFramework.callbacks.onPlayerJoin.connections) do
-			connection(v.steam_id, v.name, v.id, v.admin, v.auth)
-		end
-
-		local char_id = server.getPlayerCharacterID(v.id)
-
-		for _, connection in pairs(cuhFramework.callbacks.onObjectLoad.connections) do
-			connection(char_id)
-		end
-	end)
-end
+cuhFramework.utilities.loop.create(0.1, function() -- update player properties (auth, etc)
+	cuhFramework.backend.giveDataToCurrentPlayers(false)
+end)
 
 cuhFramework.callbacks.onPlayerLeave:connect(function(steam_id, name, peer_id, is_admin, is_auth)
 	for i, v in pairs(cuhFramework.ui.screen.activeUI) do

@@ -30,14 +30,13 @@ local connection = cuhFramework.callbacks.onVehicleSpawn:connect(function(...)
     -- Your code
 end)
 ```
-You can even **disconnect** the function, making it obsolete, by doing:
+You can even **disconnect** the function from the callback, making it obsolete, by doing:
 ```lua
-connection:disconnect() -- The function will no longer get called when a vehicle is spawned
+connection:disconnect() -- The function will no longer get called whenever a vehicle is spawned
 ```
-(Callbacks system inspired by Roblox)
 
 ## *Download*
-To download this framework, head over to the [releases](https://github.com/Roozz1/cuhFramework/releases/tag/Stable).
+To download this framework, head over to the [releases](https://github.com/Roozz1/cuhFramework/releases).
 Keep in mind, this framework is still a **work-in-progress**, while there are a lot of features so far, there are a lot more to come.
 
 To add cuhFramework into your code, simply add **cuhFramework.lua** and **cuhFramework - Build Project.exe** into the **same** folder as your addon. Then when you would like to combine your addon with the framework code, run the .exe.
